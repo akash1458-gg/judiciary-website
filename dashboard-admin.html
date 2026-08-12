@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Nyaya Setu</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .dash-header { background: #262421; color: #fff; border-bottom: 2px solid #55534c; padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; }
+  .dash-layout { display: grid; grid-template-columns: 240px 1fr; gap: 24px; padding: 32px 28px; max-width: 1400px; margin: 0 auto; }
+  .sidebar nav a { display: block; padding: 10px 14px; color: var(--charcoal); text-decoration: none; border-radius: 4px; margin-bottom: 4px; font-weight: 500; }
+  .sidebar nav a:hover { background: var(--parchment-2); }
+  .sidebar nav a.active { background: #262421; color: #fff; }
+  .card { background: #fff; border: 1px solid var(--rule); padding: 20px; margin-bottom: 24px; border-radius: 4px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-box { border: 1px solid var(--rule); padding: 20px; border-radius: 4px; border-top: 4px solid var(--ink-navy); }
+  .stat-box.warn { border-top-color: var(--maroon); background: #fff8e1; }
+  .stat-box span { display: block; font-size: 28px; font-family: var(--font-mono); font-weight: 600; margin-bottom: 4px; }
+  @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body style="background: var(--parchment-2);">
+
+<header class="dash-header">
+  <div style="display:flex; align-items:center; gap:12px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:24px; height:24px;"><path d="M12 3v18"/><path d="M4 7h16"/><path d="M4 7l-2 7a4 4 0 0 0 8 0l-2-7"/><path d="M20 7l2 7a4 4 0 0 1-8 0l2-7"/><path d="M8 21h8"/></svg>
+    <span style="font-family: var(--font-display); font-weight: 600; font-size: 1.2rem;">Registry Admin</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <span>System Administrator</span>
+    <a href="login.html" style="font-size: 13px; color: #ccc; text-decoration: none;">Log out</a>
+  </div>
+</header>
+
+<div class="dash-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav>
+      <a href="#" class="active">System Analytics</a>
+      <a href="#">User Management</a>
+      <a href="#">Audit Logs</a>
+      <a href="#">Server Status</a>
+      <a href="#">Portal Settings</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main>
+    <h1 style="font-size: 1.8rem; margin-bottom: 24px;">National Court Analytics</h1>
+    
+    <div class="stat-grid">
+      <div class="stat-box">
+        <span>99.98%</span>
+        <div style="font-size: 13px; color: var(--ink-soft);">System Uptime (30d)</div>
+      </div>
+      <div class="stat-box warn">
+        <span style="color: var(--maroon);">45,210</span>
+        <div style="font-size: 13px; color: var(--ink-soft);">Pending E-Filings (High load)</div>
+      </div>
+      <div class="stat-box">
+        <span>1,204</span>
+        <div style="font-size: 13px; color: var(--ink-soft);">Active Virtual Hearings</div>
+      </div>
+    </div>
+
+
+    <div class="card" style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0;">Real-Time System Load (Live)</h3>
+        <span style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--maroon); font-weight: 600;">
+          <span style="width: 8px; height: 8px; background: var(--maroon); border-radius: 50%; display: inline-block; animation: blink 1.5s infinite;"></span>
+          LIVE TRACKING
+        </span>
+      </div>
+      <canvas id="liveLoadChart" height="80"></canvas>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0;">Recent Audit Logs & Alerts</h3>
+        <button id="exportCsvBtn" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">Export CSV</button>
+      </div>
+      <table class="ledger" style="border: none;">
+        <thead>
+          <tr><th>Timestamp</th><th>Event ID</th><th>User / Role</th><th>Action / Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">13:42:01</td>
+            <td class="mono">SYS-990</td>
+            <td>Admin System</td>
+            <td>Daily DB Backup Completed Successfully.</td>
+          </tr>
+          <tr>
+            <td class="mono">13:40:15</td>
+            <td class="mono">USR-AUTH</td>
+            <td>Adv. R. Desai</td>
+            <td>Bulk e-filing batch of 12 petitions submitted.</td>
+          </tr>
+          <tr style="background: #fff0f0;">
+            <td class="mono" style="color:var(--maroon);">13:38:22</td>
+            <td class="mono" style="color:var(--maroon);">SEC-WARN</td>
+            <td style="color:var(--maroon);">Unknown IP</td>
+            <td style="color:var(--maroon);">Failed login attempt (x5). IP Blocked for 30m.</td>
+          </tr>
+          <tr>
+            <td class="mono">13:30:00</td>
+            <td class="mono">JUD-ACT</td>
+            <td>Hon. Justice Sharma</td>
+            <td>Signed and published order for CS/201/2026.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Sidebar interactivity
+    const sidebarLinks = document.querySelectorAll('.sidebar nav a');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            sidebarLinks.forEach(l => l.classList.remove('active'));
+            e.target.classList.add('active');
+            window.showToast('Loading ' + e.target.innerText + ' module...');
+        });
+    });
+
+    // 2. Export CSV functionality
+    const exportBtn = document.getElementById('exportCsvBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            window.showToast('Generating CSV report...');
+            setTimeout(() => {
+                const table = document.querySelector('.ledger');
+                let csvContent = "data:text/csv;charset=utf-8,";
+                
+                // Get headers
+                const headers = Array.from(table.querySelectorAll('th')).map(th => th.innerText);
+                csvContent += headers.join(',') + "\n";
+                
+                // Get rows
+                const rows = Array.from(table.querySelectorAll('tbody tr'));
+                rows.forEach(row => {
+                    const cols = Array.from(row.querySelectorAll('td')).map(td => '"' + td.innerText + '"');
+                    csvContent += cols.join(',') + "\n";
+                });
+                
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "audit_logs_report.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.showToast('CSV downloaded successfully.');
+            }, 800);
+        });
+    }
+
+    // 3. Live Stats Fluctuation
+    
+    // --- Real API Analytics ---
+    function fetchAnalytics() {
+        fetch('/api/analytics')
+        .then(res => res.json())
+        .then(data => {
+            // Update Cases Filed & Pending Filings
+            const pendingSpan = document.querySelector('.stat-box.warn span');
+            if (pendingSpan) pendingSpan.innerText = data.pendingFilings.toLocaleString('en-IN');
+            
+            // Update Audit Logs Table
+            const tbody = document.querySelector('.ledger tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                data.logs.forEach(log => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = '<td class="mono">' + log.timestamp + '</td><td class="mono">' + log.event_id + '</td><td>' + log.role + '</td><td>' + log.description + '</td>';
+                    tbody.appendChild(tr);
+                });
+            }
+        });
+    }
+    
+    // Fetch once on load, then poll every 5s
+    fetchAnalytics();
+    setInterval(fetchAnalytics, 5000);
+
+});
+</script>
+
+<script src="scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Citizen Dashboard — Nyaya Setu</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .dash-header { background: #fff; border-bottom: 1px solid var(--rule); padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; }
+  .dash-layout { display: grid; grid-template-columns: 240px 1fr 300px; gap: 24px; padding: 32px 28px; max-width: 1400px; margin: 0 auto; }
+  .sidebar nav a { display: block; padding: 10px 14px; color: var(--charcoal); text-decoration: none; border-radius: 4px; margin-bottom: 4px; font-weight: 500; }
+  .sidebar nav a:hover { background: var(--parchment-2); }
+  .sidebar nav a.active { background: var(--ink-navy); color: #fff; }
+  .card { background: #fff; border: 1px solid var(--rule); padding: 20px; margin-bottom: 24px; border-radius: 4px; }
+  .ai-chat { background: var(--parchment); border: 1px solid var(--brass); padding: 20px; border-radius: 4px; }
+  .ai-chat .bubble { background: #fff; padding: 12px; border-radius: 8px; font-size: 13.5px; border: 1px solid var(--rule); margin-bottom: 12px; }
+</style>
+</head>
+<body style="background: var(--parchment-2);">
+
+<header class="dash-header">
+  <div style="display:flex; align-items:center; gap:12px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" stroke-width="2" style="width:24px; height:24px;"><path d="M12 3v18"/><path d="M4 7h16"/><path d="M4 7l-2 7a4 4 0 0 0 8 0l-2-7"/><path d="M20 7l2 7a4 4 0 0 1-8 0l2-7"/><path d="M8 21h8"/></svg>
+    <span style="font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; color: var(--ink-navy);">Nyaya Setu</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <button type="button" style="border:none; background:none; cursor:pointer;" onclick="window.showToast('No new notifications')">🔔</button>
+    <div style="width: 32px; height: 32px; background: var(--brass); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">AJ</div>
+    <a href="login.html" style="font-size: 13px; color: var(--maroon); text-decoration: none;">Log out</a>
+  </div>
+</header>
+
+<div class="dash-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav>
+      <a href="#" class="active">My Dashboard</a>
+      <a href="#">My Cases (2)</a>
+      <a href="#">Hearing Schedule</a>
+      <a href="#">Document Vault</a>
+      <a href="#">Payments Hub</a>
+      <a href="#">Settings</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main>
+    <h1 style="font-size: 1.8rem; margin-bottom: 24px;">Welcome back, Amit.</h1>
+    
+    <div class="card">
+      <h3 style="margin-bottom: 16px;">Active Cases</h3>
+      <table class="ledger" style="border: none;">
+        <thead>
+          <tr><th>Case Number</th><th>Title</th><th>Next Hearing</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">CS/405/2025</td>
+            <td>Amit Joshi v. State</td>
+            <td class="mono" style="color: var(--maroon); font-weight: 600;">Tomorrow, 10:30 AM</td>
+            <td><a href="#" class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="window.showToast('Joining virtual room...')">Join Virtual</a></td>
+          </tr>
+          <tr>
+            <td class="mono">PT/112/2024</td>
+            <td>Property Dispute</td>
+            <td class="mono">15 Sep 2026</td>
+            <td><span class="status-badge pending">Awaiting Order</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <div class="card">
+        <h3>Pending Actions</h3>
+        <ul style="padding-left: 16px; font-size: 14px; margin-bottom: 0;">
+          <li style="margin-bottom: 8px;">Upload Affidavit (CS/405/2025) <a href="#" style="color:var(--maroon);">Upload</a></li>
+          <li>Pay Court Fee (PT/112/2024) - ₹500 <a href="#" style="color:var(--maroon);">Pay Now</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Recent Documents</h3>
+        <ul style="padding-left: 16px; font-size: 14px; margin-bottom: 0;">
+          <li style="margin-bottom: 8px;">Summons_Copy.pdf <a href="#" style="color:var(--ink-soft);">Download</a></li>
+          <li>FIR_Report.pdf <a href="#" style="color:var(--ink-soft);">Download</a></li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- Right Sidebar (Chanakya AI) -->
+  <aside>
+    <div class="ai-chat">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom: 16px;">
+        <span style="font-size: 24px;">🤖</span>
+        <h3 style="margin:0; font-size: 1.1rem;">Chanakya AI</h3>
+      </div>
+      <p style="font-size: 13px; color: var(--ink-soft);">Your personal legal assistant.</p>
+      
+      <div class="bubble">
+        <strong>Chanakya:</strong> Namaste Amit. You have a virtual hearing tomorrow at 10:30 AM for CS/405/2025. Would you like me to summarize the case history?
+      </div>
+      <div class="bubble" style="background: var(--ink-navy); color: #fff; margin-left: 20px;">
+        <strong>You:</strong> Yes, please. And what should I prepare?
+      </div>
+      <div class="bubble">
+        <strong>Chanakya:</strong> Generating summary... Please ensure you have your Affidavit ready to present. <a href="#" style="color:var(--maroon);">View Draft</a>
+      </div>
+
+      <input type="text" placeholder="Ask a legal question..." style="width: 100%; padding: 10px; border: 1px solid var(--rule); border-radius: 4px; font-family: var(--font-body); margin-top: 10px;">
+    </div>
+  </aside>
+</div>
+
+<script src="scripts.js"></script>
+</body>
+</html>

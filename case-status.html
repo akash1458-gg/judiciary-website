@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Status — Nyaya Setu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="util-bar">
+  <div class="container">
+    <div class="util-left"><span>Government of India Â· Department of Justice</span></div>
+    <div class="util-right">
+      <button type="button">A- A A+</button>
+      <button type="button">High contrast</button>
+      <a href="#">हिंदी</a>
+      <a href="#">ગુજરાતી</a>
+      <a href="login.html" style="background:var(--maroon);color:#fff;padding:2px 10px;border-radius:2px;text-decoration:none;font-weight:600;margin-left:8px;">Portal Login</a>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="emblem" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v18"/>
+        <path d="M4 7h16"/>
+        <path d="M4 7l-2 7a4 4 0 0 0 8 0l-2-7"/>
+        <path d="M20 7l2 7a4 4 0 0 1-8 0l2-7"/>
+        <path d="M8 21h8"/>
+      </svg>
+    </div>
+    <div class="brand-block">
+      <p class="brand-title">Nyaya Setu</p>
+      <p class="brand-sub">Judicial Services Portal</p>
+    </div>
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="case-status.html" class="active">Case Status</a>
+      <a href="services.html">Services</a>
+      <a href="courts.html">Courts</a>
+      <a href="notices.html">Notices</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-head">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Case Status</div>
+    <h1>Case status</h1>
+    <p>Search the national case registry by CNR number, case number, or party name. Results reflect the last sync from the connected district court.</p>
+  </div>
+</div>
+
+<main id="main">
+  <section style="padding-top:40px;">
+    <div class="container">
+
+      <div class="tabs" role="tablist" aria-label="Search method">
+        <button class="tab-btn active" role="tab" aria-selected="true" data-tab="cnr">By CNR number</button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="casenum">By case number</button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="party">By party name</button>
+      </div>
+
+      <div class="tab-panel active" id="panel-cnr">
+        <div class="field-grid">
+          <div class="field">
+            <label for="cnr">CNR number</label>
+            <input type="text" id="cnr" placeholder="GJAM01-002345-2024">
+          </div>
+          <div class="field">
+            <label for="captcha1">Verification code</label>
+            <input type="text" id="captcha1" placeholder="Enter code shown below">
+          </div>
+        </div>
+        <button class="btn btn-primary" type="button">Search record</button>
+      </div>
+
+      <div class="tab-panel" id="panel-casenum">
+        <div class="field-grid">
+          <div class="field">
+            <label for="state">State</label>
+            <select id="state"><option value="">Select State</option>
+<option>Andhra Pradesh</option>
+<option>Arunachal Pradesh</option>
+<option>Assam</option>
+<option>Bihar</option>
+<option>Chhattisgarh</option>
+<option>Goa</option>
+<option>Gujarat</option>
+<option>Haryana</option>
+<option>Himachal Pradesh</option>
+<option>Jharkhand</option>
+<option>Karnataka</option>
+<option>Kerala</option>
+<option>Madhya Pradesh</option>
+<option>Maharashtra</option>
+<option>Manipur</option>
+<option>Meghalaya</option>
+<option>Mizoram</option>
+<option>Nagaland</option>
+<option>Odisha</option>
+<option>Punjab</option>
+<option>Rajasthan</option>
+<option>Sikkim</option>
+<option>Tamil Nadu</option>
+<option>Telangana</option>
+<option>Tripura</option>
+<option>Uttar Pradesh</option>
+<option>Uttarakhand</option>
+<option>West Bengal</option>
+<option>Andaman and Nicobar Islands</option>
+<option>Chandigarh</option>
+<option>Dadra and Nagar Haveli and Daman and Diu</option>
+<option>Delhi</option>
+<option>Jammu and Kashmir</option>
+<option>Ladakh</option>
+<option>Lakshadweep</option>
+<option>Puducherry</option></select>
+          </div>
+          <div class="field">
+            <label for="district">District court</label>
+            <select id="district"><option value="">Select District</option>
+<option>Ahmedabad</option>
+<option>Surat</option>
+<option>Vadodara</option>
+<option>Rajkot</option>
+<option>Gandhinagar</option>
+<option>Mumbai</option>
+<option>Pune</option>
+<option>Nagpur</option>
+<option>New Delhi</option>
+<option>Central Delhi</option>
+<option>Bangalore Urban</option>
+<option>Chennai</option>
+<option>Hyderabad</option>
+<option>Kolkata</option>
+<option>Jaipur</option>
+<option>Lucknow</option>
+<option>Patna</option>
+<option>Bhopal</option>
+<option>Indore</option>
+<option>Thiruvananthapuram</option>
+<option>Ernakulam</option>
+<option>Guwahati</option>
+<option>Bhubaneswar</option></select>
+          </div>
+          <div class="field">
+            <label for="casetype">Case type</label>
+            <select id="casetype"><option>Civil Suit</option><option>Criminal</option><option>Execution</option></select>
+          </div>
+          <div class="field">
+            <label for="caseyear">Case number / Year</label>
+            <input type="text" id="caseyear" placeholder="1234 / 2024">
+          </div>
+        </div>
+        <button class="btn btn-primary" type="button">Search record</button>
+      </div>
+
+      <div class="tab-panel" id="panel-party">
+        <div class="field-grid">
+          <div class="field">
+            <label for="pname">Party name</label>
+            <input type="text" id="pname" placeholder="Full name as on filing">
+          </div>
+          <div class="field">
+            <label for="pyear">Filing year</label>
+            <input type="text" id="pyear" placeholder="2024">
+          </div>
+        </div>
+        <button class="btn btn-primary" type="button">Search record</button>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="padding-top:12px;">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Register Extract</span>
+          <h2>Recent lookups on this connection</h2>
+        </div>
+      </div>
+
+      <table class="ledger">
+        <caption>Showing 4 of 4 records Â· last synced 12 Aug 2026, 09:14 IST</caption>
+        <thead>
+          <tr>
+            <th>CNR number</th>
+            <th>Case title</th>
+            <th>Court</th>
+            <th>Next hearing</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">GJAM01-002345-2024</td>
+            <td>Patel v. Shah — Civil Suit</td>
+            <td>District Court, Ahmedabad (Rural)</td>
+            <td class="mono">21 Aug 2026</td>
+            <td><span class="status-badge pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td class="mono">GJAM01-001987-2023</td>
+            <td>State v. Rathod — Criminal Case</td>
+            <td>Sessions Court, Ahmedabad</td>
+            <td class="mono">—</td>
+            <td><span class="status-badge disposed">Disposed</span></td>
+          </tr>
+          <tr>
+            <td class="mono">GJAM04-000456-2025</td>
+            <td>Desai Housing Co-op — Execution Petition</td>
+            <td>District Court, Gandhinagar</td>
+            <td class="mono">02 Sep 2026</td>
+            <td><span class="status-badge pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td class="mono">GJAM01-003012-2024</td>
+            <td>Mehta v. Union of India — Writ Petition</td>
+            <td>High Court of Gujarat</td>
+            <td class="mono">Order reserved</td>
+            <td><span class="status-badge reserved">Reserved</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4>Nyaya Setu</h4>
+        <p>An initiative of the Department of Justice to make court records and services accessible to every citizen.</p>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="case-status.html">Case status</a></li>
+          <li><a href="services.html">e-Filing</a></li>
+          <li><a href="courts.html">Cause list</a></li>
+          <li><a href="services.html">Court fee calculator</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Forms &amp; downloads</a></li>
+          <li><a href="notices.html">Acts &amp; rules</a></li>
+          <li><a href="#">Judgments archive</a></li>
+          <li><a href="about.html">RTI</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Help</h4>
+        <ul>
+          <li><a href="about.html">Contact registry</a></li>
+          <li><a href="#">Accessibility statement</a></li>
+          <li><a href="about.html">Grievance redressal</a></li>
+          <li><a href="about.html">FAQs</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Â© 2026 Department of Justice. Content owned and maintained by respective courts.</span>
+      <span>Best viewed with assistive technology enabled Â· WCAG 2.1 AA</span>
+    </div>
+  </div>
+</footer>
+
+<script src="scripts.js"></script>
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active'); b.setAttribute('aria-selected','false');});
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected','true');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Intercept search buttons
+    const searchBtns = document.querySelectorAll('.btn-primary');
+    searchBtns.forEach(btn => {
+        if (btn.innerText.includes('Search record')) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Find nearest input
+                const input = btn.parentElement.querySelector('input');
+                if (input && input.value.trim() !== '') {
+                    window.showToast('Searching registry for: ' + input.value);
+                    
+                    fetch('/api/search?cnr=' + encodeURIComponent(input.value))
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.showToast('Case found: ' + data.case.title);
+                            
+                            // Inject result below the form
+                            const resultDiv = document.createElement('div');
+                            resultDiv.style = 'margin-top: 24px; padding: 20px; background: #fff; border: 1px solid var(--rule); border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);';
+                            resultDiv.innerHTML = '<h3 style="margin-bottom:12px; color:var(--ink-navy); border-bottom: 2px solid var(--rule); padding-bottom: 8px;">Case Details</h3>' +
+                                '<table style="width: 100%; border-collapse: collapse; text-align: left;">' +
+                                    '<tr><td style="padding: 8px 0; border-bottom: 1px solid var(--rule);"><strong>CNR Number</strong></td><td class="mono" style="padding: 8px 0; border-bottom: 1px solid var(--rule);">' + data.case.cnr_number + '</td></tr>' +
+                                    '<tr><td style="padding: 8px 0; border-bottom: 1px solid var(--rule);"><strong>Title</strong></td><td style="padding: 8px 0; border-bottom: 1px solid var(--rule);">' + data.case.title + '</td></tr>' +
+                                    '<tr><td style="padding: 8px 0; border-bottom: 1px solid var(--rule);"><strong>Status</strong></td><td style="padding: 8px 0; border-bottom: 1px solid var(--rule);"><span class="status-badge">' + data.case.status + '</span></td></tr>' +
+                                    '<tr><td style="padding: 8px 0;"><strong>Next Hearing</strong></td><td style="padding: 8px 0; color:var(--maroon); font-weight: 600;">' + data.case.next_hearing + '</td></tr>' +
+                                '</table>';
+                            btn.closest('.tab-content').appendChild(resultDiv);
+                        } else {
+                            window.showToast('Error: ' + data.message);
+                        }
+                    });
+                } else {
+                    window.showToast('Please enter a value to search.');
+                }
+            });
+        }
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advocate Workspace — Nyaya Setu</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .dash-header { background: var(--white); border-bottom: 3px solid var(--brass); padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; }
+  .dash-layout { display: grid; grid-template-columns: 240px 1fr 320px; gap: 24px; padding: 32px 28px; max-width: 1400px; margin: 0 auto; }
+  .sidebar nav a { display: block; padding: 10px 14px; color: var(--charcoal); text-decoration: none; border-radius: 4px; margin-bottom: 4px; font-weight: 500; }
+  .sidebar nav a:hover { background: var(--parchment-2); }
+  .sidebar nav a.active { background: var(--ink-navy); color: #fff; }
+  .card { background: #fff; border: 1px solid var(--rule); padding: 20px; margin-bottom: 24px; border-radius: 4px; }
+  .drop-zone { border: 2px dashed var(--rule); padding: 40px; text-align: center; border-radius: 4px; background: var(--parchment-2); margin-bottom: 16px; cursor: pointer; transition: background 0.2s; }
+  .drop-zone:hover { background: #EAE3CF; }
+</style>
+</head>
+<body style="background: var(--parchment-2);">
+
+<header class="dash-header">
+  <div style="display:flex; align-items:center; gap:12px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" stroke-width="2" style="width:24px; height:24px;"><path d="M12 3v18"/><path d="M4 7h16"/><path d="M4 7l-2 7a4 4 0 0 0 8 0l-2-7"/><path d="M20 7l2 7a4 4 0 0 1-8 0l2-7"/><path d="M8 21h8"/></svg>
+    <span style="font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; color: var(--ink-navy);">Advocate Workspace</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <span>Adv. R. Desai</span>
+    <a href="login.html" style="font-size: 13px; color: var(--maroon); text-decoration: none;">Log out</a>
+  </div>
+</header>
+
+<div class="dash-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav>
+      <a href="#" class="active">Overview</a>
+      <a href="#">Calendar & Conflicts</a>
+      <a href="#">Client Directory</a>
+      <a href="#">Bulk E-Filing</a>
+      <a href="#">Affidavits & Vault</a>
+      <a href="#">Billing</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main>
+    <h1 style="font-size: 1.8rem; margin-bottom: 24px;">Workspace</h1>
+    
+    <div class="card">
+      <h3 style="margin-bottom: 16px;">Bulk E-Filing Tool</h3>
+      <div class="drop-zone" onclick="window.fileNewCase()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px; height:32px; color: var(--ink-soft); margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p style="margin: 0; font-weight: 600; color: var(--ink-navy);">Drag and drop petitions (.pdf) to file in bulk</p>
+        <p style="font-size: 12px; margin-top: 4px;">Max 20 files per batch. Digital signatures required.</p>
+      </div>
+      <button class="btn btn-primary" onclick="window.fileNewCase()">Process Batch</button>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 16px;">Active Client Matters</h3>
+      <table class="ledger" style="border: none;">
+        <thead>
+          <tr><th>Client Name</th><th>Case Type</th><th>Next Deadline</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mehta & Sons Ltd.</td>
+            <td>Corporate Dispute</td>
+            <td class="mono" style="color: var(--maroon);">Today</td>
+            <td><a href="#" class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;">Manage</a></td>
+          </tr>
+          <tr>
+            <td>Priya Singh</td>
+            <td>Family Court</td>
+            <td class="mono">18 Aug 2026</td>
+            <td><a href="#" class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;">Manage</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Right Sidebar (Calendar) -->
+  <aside>
+    <div class="card" style="padding: 16px;">
+      <h3 style="font-size: 1.1rem; border-bottom: 1px solid var(--rule); padding-bottom: 8px; margin-bottom: 16px;">Schedule & Conflicts</h3>
+      
+      <div style="background: #fff8e1; border-left: 3px solid var(--maroon); padding: 12px; margin-bottom: 12px; font-size: 13px;">
+        <strong style="color: var(--maroon); display: block; margin-bottom: 4px;">⚠️ Scheduling Conflict!</strong>
+        You are scheduled for two hearings simultaneously on 14 Aug at 10:30 AM in District Court (Room 4) and High Court (Virtual).
+        <div style="margin-top: 8px;">
+          <button class="btn btn-primary" style="padding: 4px 8px; font-size: 11px;" onclick="window.showToast('Adjournment request drafted.')">Request Adjournment</button>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--rule); padding: 12px; border-radius: 4px; font-size: 13px; margin-bottom: 8px;">
+        <strong style="display: block;">Tomorrow, 2:00 PM</strong>
+        Submission deadline for Rejoinder - Mehta & Sons.
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script src="scripts.js"></script>
+</body>
+</html>

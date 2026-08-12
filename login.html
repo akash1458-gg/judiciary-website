@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unified Portal Login — Nyaya Setu</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .login-container { max-width: 500px; margin: 60px auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+  .login-tabs { display: flex; border-bottom: 2px solid var(--rule); margin-bottom: 32px; overflow-x: auto;}
+  .login-tabs button { flex: 1; padding: 12px; border: none; background: none; font-family: var(--font-body); font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; font-size: 14px; white-space: nowrap; }
+  .login-tabs button.active { color: var(--maroon); border-bottom-color: var(--maroon); }
+  .form-group { margin-bottom: 20px; text-align: left; }
+  .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--ink-navy); }
+  .form-group input { width: 100%; padding: 12px; border: 1px solid var(--rule); border-radius: 4px; font-family: var(--font-body); box-sizing: border-box; }
+</style>
+</head>
+<body style="background: var(--parchment-2);">
+
+<div style="text-align: center; margin-top: 60px;">
+  <div class="emblem" style="margin: 0 auto 16px; border-color: var(--brass-light); width: 60px; height: 60px;" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:30px; height:30px; margin-top: 14px;"><path d="M12 3v18"/><path d="M4 7h16"/><path d="M4 7l-2 7a4 4 0 0 0 8 0l-2-7"/><path d="M20 7l2 7a4 4 0 0 1-8 0l2-7"/><path d="M8 21h8"/></svg>
+  </div>
+  <h1 style="font-size: 2rem; color: var(--ink-navy); margin-bottom: 8px;">Nyaya Setu Login</h1>
+  <p style="color: var(--ink-soft);">Access the unified judicial gateway.</p>
+</div>
+
+<div class="login-container">
+  <div class="login-tabs">
+    <button class="active" onclick="switchTab('citizen')">Citizen</button>
+    <button onclick="switchTab('advocate')">Advocate</button>
+    <button onclick="switchTab('judge')">Judicial Officer</button>
+    <button onclick="switchTab('admin')">Department</button>
+  </div>
+
+  <form id="loginForm" onsubmit="handleLogin(event)">
+    <div id="dynamic-fields">
+      <div class="form-group">
+        <label>Mobile Number / Aadhaar</label>
+        <input type="text" placeholder="Enter your registered mobile or Aadhaar" required>
+      </div>
+      <div class="form-group">
+        <label>OTP</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" placeholder="6-digit code" required style="flex:1;">
+          <button type="button" class="btn btn-outline" onclick="window.showToast('OTP sent to registered mobile.')">Get OTP</button>
+        </div>
+      </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Mobile: <strong>9876543210</strong> | OTP: <strong>123456</strong></div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px; margin-top: 16px;">Login to Portal</button>
+  </form>
+  
+  <div style="margin-top: 24px; text-align: center;">
+    <a href="#" id="toggleRegister" onclick="toggleRegisterForm(event)" style="color: var(--maroon); font-size: 14px; text-decoration: none; font-weight: 600;">New user? Register here →</a>
+  </div>
+  <div style="margin-top: 12px; text-align: center;">
+    <a href="index.html" style="color: var(--ink-soft); font-size: 14px; text-decoration: none;">← Return to Public Home</a>
+  </div>
+</div>
+
+<!-- Registration Form (hidden by default) -->
+<div class="login-container" id="registerContainer" style="display:none;">
+  <h2 style="font-size: 1.4rem; margin-bottom: 8px; color: var(--ink-navy);">Create New Account</h2>
+  <p style="color: var(--ink-soft); font-size: 14px; margin-bottom: 24px;">Register to access the Nyaya Setu portal.</p>
+  
+  <form id="registerForm" onsubmit="handleRegister(event)">
+    <div class="form-group">
+      <label>Full Name *</label>
+      <input type="text" id="reg-name" placeholder="Enter your full name" required>
+    </div>
+    <div class="form-group">
+      <label>Role *</label>
+      <select id="reg-role" style="width:100%; padding:12px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;" onchange="updateRegFields()">
+        <option value="citizen">Citizen</option>
+        <option value="advocate">Advocate</option>
+        <option value="judge">Judicial Officer</option>
+        <option value="admin">Department / Admin</option>
+      </select>
+    </div>
+    <div class="form-group" id="reg-id-group">
+      <label id="reg-id-label">Mobile Number / Aadhaar *</label>
+      <input type="text" id="reg-username" placeholder="Enter your mobile number or Aadhaar" required>
+    </div>
+    <div class="form-group">
+      <label>Password *</label>
+      <input type="password" id="reg-password" placeholder="Create a password (min 4 characters)" required minlength="4">
+    </div>
+    <div class="form-group">
+      <label>Confirm Password *</label>
+      <input type="password" id="reg-confirm" placeholder="Re-enter password" required minlength="4">
+    </div>
+    
+    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px; margin-top: 8px;">Register Account</button>
+  </form>
+  
+  <div style="margin-top: 20px; text-align: center;">
+    <a href="#" onclick="toggleRegisterForm(event)" style="color: var(--maroon); font-size: 14px; text-decoration: none; font-weight: 600;">← Back to Login</a>
+  </div>
+</div>
+
+<script src="scripts.js"></script>
+<script>
+  let currentRole = 'citizen';
+  let isRegisterMode = false;
+  
+  function toggleRegisterForm(e) {
+    e.preventDefault();
+    isRegisterMode = !isRegisterMode;
+    document.getElementById('registerContainer').style.display = isRegisterMode ? '' : 'none';
+    // Hide/show the login container (first .login-container)
+    document.querySelectorAll('.login-container')[0].style.display = isRegisterMode ? 'none' : '';
+  }
+
+  function updateRegFields() {
+    var role = document.getElementById('reg-role').value;
+    var label = document.getElementById('reg-id-label');
+    var input = document.getElementById('reg-username');
+    if (role === 'citizen') {
+      label.innerText = 'Mobile Number / Aadhaar *';
+      input.placeholder = 'Enter your mobile number or Aadhaar';
+    } else if (role === 'advocate') {
+      label.innerText = 'Bar Council Enrollment ID *';
+      input.placeholder = 'e.g. BAR/456/2015';
+    } else {
+      label.innerText = 'Official Gov ID / Nyaya ID *';
+      input.placeholder = 'e.g. GOV-1234';
+    }
+  }
+
+  function handleRegister(e) {
+    e.preventDefault();
+    var name = document.getElementById('reg-name').value;
+    var role = document.getElementById('reg-role').value;
+    var username = document.getElementById('reg-username').value;
+    var password = document.getElementById('reg-password').value;
+    var confirm = document.getElementById('reg-confirm').value;
+
+    if (password !== confirm) {
+      window.showToast('Passwords do not match!');
+      return;
+    }
+
+    window.showToast('Creating your account...');
+
+    fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ display_name: name, role: role, username: username, password: password })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.success) {
+        window.showToast('Registration successful! Please log in.');
+        // Switch back to login
+        toggleRegisterForm(new Event('click'));
+        // Pre-fill the login with their role
+        switchTab(role);
+      } else {
+        window.showToast('Error: ' + data.message);
+      }
+    })
+    .catch(function() {
+      window.showToast('Network error. Is the server running?');
+    });
+  }
+
+  function switchTab(role) {
+    currentRole = role;
+    document.querySelectorAll('.login-tabs button').forEach(b => b.classList.remove('active'));
+    // Find the correct tab button
+    var tabs = document.querySelectorAll('.login-tabs button');
+    if (role === 'citizen') tabs[0].classList.add('active');
+    else if (role === 'advocate') tabs[1].classList.add('active');
+    else if (role === 'judge') tabs[2].classList.add('active');
+    else tabs[3].classList.add('active');
+    
+    const dynamicFields = document.getElementById('dynamic-fields');
+    if (role === 'citizen') {
+      dynamicFields.innerHTML = `
+        <div class="form-group">
+          <label>Mobile Number / Aadhaar</label>
+          <input type="text" placeholder="Enter your registered mobile or Aadhaar" required>
+        </div>
+        <div class="form-group">
+          <label>OTP</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" placeholder="6-digit code" required style="flex:1;">
+            <button type="button" class="btn btn-outline" onclick="window.showToast('OTP sent to registered mobile.')">Get OTP</button>
+          </div>
+        </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Mobile: <strong>9876543210</strong> | OTP: <strong>123456</strong></div>`;
+    } else if (role === 'advocate') {
+      dynamicFields.innerHTML = `
+        <div class="form-group">
+          <label>Bar Council Enrollment ID</label>
+          <input type="text" placeholder="e.g. BAR/123/2010" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="Enter your password" required>
+        </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Bar ID: <strong>BAR/123/2010</strong> | Password: <strong>demo</strong></div>`;
+    } else {
+      dynamicFields.innerHTML = `
+        <div class="form-group">
+          <label>Official Gov ID / Nyaya ID</label>
+          <input type="text" placeholder="Enter your official ID" required>
+        </div>
+        <div class="form-group">
+          <label>Secure Password</label>
+          <input type="password" placeholder="Enter your password" required>
+        </div>
+        <div class="form-group">
+          <label>Hardware Token (2FA)</label>
+          <input type="text" placeholder="Enter token code" required>
+        </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Official ID: <strong>GOV-8822</strong> | Password: <strong>demo</strong> | Token: <strong>0000</strong></div>`;
+    }
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    window.showToast('Authenticating securely...');
+    
+    let username = '';
+    let password = '';
+    const inputs = document.querySelectorAll('#dynamic-fields input');
+    
+    if (currentRole === 'citizen') {
+        username = inputs[0].value;
+        password = inputs[1].value;
+    } else if (currentRole === 'advocate') {
+        username = inputs[0].value;
+        password = inputs[1].value;
+    } else {
+        username = inputs[0].value;
+        password = inputs[1].value;
+    }
+
+    fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role: currentRole })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('role', data.role);
+            localStorage.setItem('display_name', data.display_name);
+            window.showToast('Login successful! Welcome, ' + data.display_name);
+            setTimeout(() => {
+                if (currentRole === 'citizen') window.location.href = 'dashboard-citizen.html';
+                if (currentRole === 'advocate') window.location.href = 'dashboard-lawyer.html';
+                if (currentRole === 'judge') window.location.href = 'dashboard-judge.html';
+                if (currentRole === 'admin') window.location.href = 'dashboard-admin.html';
+            }, 800);
+        } else {
+            window.showToast('Error: ' + data.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        window.showToast('Network error connecting to server.');
+    });
+  }
+</script>
+</body>
+</html>
