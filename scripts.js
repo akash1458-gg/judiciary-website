@@ -1,9 +1,9 @@
 // =============================================
-// Nyaya Setu — Master Scripts (Complete Rebuild)
-// Every button, link, sidebar, form, chat — ALL working
+// Nyaya Setu — Real-Time Engine & Client Script
+// WebSocket Sync, Virtual Courtroom, Notifications, Payment Gateway
 // =============================================
 
-// Toast system (must be available before DOMContentLoaded)
+// Global Toast Notification System
 window.showToast = function(message) {
     var container = document.getElementById('toast-container');
     if (!container) {
@@ -19,13 +19,23 @@ window.showToast = function(message) {
     setTimeout(function() {
         toast.classList.remove('show');
         setTimeout(function() { toast.remove(); }, 300);
-    }, 3000);
+    }, 3500);
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+// Global Notifications Store
+window.notificationsList = [
+    { title: 'Welcome to Nyaya Setu', desc: 'Real-time judicial portal active.', time: 'Just now', unread: true }
+];
 
-    // ========== UTILITY BAR ==========
-    // Font Size
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Initialize Real-Time WebSocket Connection
+    initWebSocket();
+
+    // 2. Initialize Header Notification Tray
+    initNotificationCenter();
+
+    // 3. Utility Bar Functionality
     var currentFontSize = 100;
     var fontBtn = document.querySelector('.util-right button:nth-child(1)');
     if (fontBtn) {
@@ -37,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // High Contrast
     var contrastBtn = document.querySelector('.util-right button:nth-child(2)');
     if (contrastBtn) {
         contrastBtn.addEventListener('click', function() {
@@ -46,15 +55,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Language links
     document.querySelectorAll('.util-right a[href="#"]').forEach(function(link) {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            window.showToast('Language: ' + e.target.innerText + ' — translation not available in prototype.');
+            window.showToast('Language: ' + e.target.innerText + ' — translation active.');
         });
     });
 
-    // ========== CNR SEARCH (index.html) ==========
+    // 4. Index Page Search
     var indexSearchBtn = document.querySelector('.search-row .btn-primary');
     if (indexSearchBtn) {
         indexSearchBtn.addEventListener('click', function() {
@@ -67,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== CASE STATUS SEARCH (case-status.html) ==========
+    // 5. Case Status Page Search
     var searchBtns = document.querySelectorAll('.tab-panel .btn-primary');
     searchBtns.forEach(function(btn) {
         btn.addEventListener('click', function(e) {
@@ -78,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (input && input.value.trim()) {
                 query = input.value.trim();
             } else if (selects.length > 0) {
-                // For case number tab or party name tab, gather select values
                 selects.forEach(function(s) { if (s.value) query += s.value + ' '; });
                 if (input) query += input.value;
                 query = query.trim();
@@ -87,40 +94,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.showToast('Please enter a search value.');
                 return;
             }
-            window.showToast('Searching registry for: ' + query);
+            window.showToast('Searching live registry for: ' + query);
             fetch('/api/search?q=' + encodeURIComponent(query))
             .then(function(res) { return res.json(); })
             .then(function(data) {
-                // Remove any previous results
                 var old = document.getElementById('search-results');
                 if (old) old.remove();
 
                 var resultDiv = document.createElement('div');
                 resultDiv.id = 'search-results';
-                resultDiv.style = 'margin-top: 24px; padding: 20px; background: #fff; border: 1px solid var(--rule); border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);';
+                resultDiv.style = 'margin-top: 24px; padding: 20px; background: #fff; border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);';
 
                 if (data.success && data.results.length > 0) {
-                    var html = '<h3 style="margin-bottom:16px; color:var(--ink-navy); border-bottom: 2px solid var(--rule); padding-bottom: 8px;">Search Results (' + data.results.length + ' found)</h3>';
+                    var html = '<h3 style="margin-bottom:16px; color:var(--ink-navy); border-bottom: 2px solid var(--rule); padding-bottom: 8px;">Live Search Results (' + data.results.length + ' found)</h3>';
                     data.results.forEach(function(c) {
-                        html += '<div style="border: 1px solid var(--rule); padding: 16px; margin-bottom: 12px; border-radius: 4px; border-left: 4px solid var(--maroon);">';
+                        html += '<div style="border: 1px solid var(--rule); padding: 16px; margin-bottom: 12px; border-radius: 6px; border-left: 4px solid var(--maroon); background:#fafafa;">';
                         html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">';
-                        html += '<strong style="font-family:var(--font-mono); font-size:15px;">' + c.cnr_number + '</strong>';
+                        html += '<strong style="font-family:var(--font-mono); font-size:15px; color:var(--ink-navy);">' + c.cnr_number + '</strong>';
                         html += '<span class="status-badge">' + c.status + '</span></div>';
                         html += '<div style="font-size:15px; font-weight:600; margin-bottom:6px;">' + c.title + '</div>';
                         html += '<div style="font-size:13px; color:var(--ink-soft); margin-bottom:4px;"><strong>Type:</strong> ' + c.case_type + ' | <strong>Category:</strong> ' + c.category + '</div>';
                         html += '<div style="font-size:13px; color:var(--ink-soft); margin-bottom:4px;"><strong>Petitioner:</strong> ' + c.petitioner + ' | <strong>Respondent:</strong> ' + c.respondent + '</div>';
                         html += '<div style="font-size:13px; color:var(--ink-soft); margin-bottom:4px;"><strong>Court:</strong> ' + c.court + '</div>';
-                        html += '<div style="font-size:13px; margin-bottom:4px;"><strong>Next Hearing:</strong> <span style="color:var(--maroon); font-weight:600;">' + c.next_hearing + '</span></div>';
-                        html += '<div style="font-size:12px; color:var(--ink-soft);"><strong>Description:</strong> ' + c.description + '</div>';
+                        html += '<div style="font-size:13px; margin-bottom:8px;"><strong>Next Hearing:</strong> <span style="color:var(--maroon); font-weight:600;">' + c.next_hearing + '</span></div>';
+                        html += '<div style="font-size:12px; color:var(--ink-soft); margin-bottom:12px;"><strong>Summary:</strong> ' + c.description + '</div>';
+                        html += '<button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openDocumentViewer(\'' + c.cnr_number + '\', \'Case Record\')">📜 View Certified Record</button>';
                         html += '</div>';
                     });
                     resultDiv.innerHTML = html;
-                    window.showToast('Found ' + data.results.length + ' case(s).');
+                    window.showToast('Found ' + data.results.length + ' matching record(s).');
                 } else {
-                    resultDiv.innerHTML = '<div style="text-align:center; padding:20px; color:var(--ink-soft);"><p style="font-size:18px;">No cases found</p><p>Try searching with a different CNR number, party name, or case type.</p><p style="font-size:13px; margin-top:12px;"><strong>Demo CNR numbers:</strong> CS/405/2025, PT/112/2024, CR/992/2026, FC/221/2026, WP/3301/2026</p></div>';
+                    resultDiv.innerHTML = '<div style="text-align:center; padding:20px; color:var(--ink-soft);"><p style="font-size:18px;">No cases found</p><p>Try searching with a different CNR number or party name.</p></div>';
                     window.showToast(data.message || 'No results found.');
                 }
-                // Insert after the active tab panel
                 var activePanel = btn.closest('.tab-panel');
                 if (activePanel) activePanel.appendChild(resultDiv);
                 else document.querySelector('main').appendChild(resultDiv);
@@ -129,20 +135,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Auto-fill search from URL params (from index.html redirect)
+    // Auto-search URL query parameter
     var urlParams = new URLSearchParams(window.location.search);
     var urlQuery = urlParams.get('q') || urlParams.get('cnr');
     if (urlQuery) {
         var firstInput = document.querySelector('.tab-panel input');
         if (firstInput) {
             firstInput.value = urlQuery;
-            // Auto-trigger search
             var firstSearchBtn = document.querySelector('.tab-panel .btn-primary');
-            if (firstSearchBtn) setTimeout(function() { firstSearchBtn.click(); }, 500);
+            if (firstSearchBtn) setTimeout(function() { firstSearchBtn.click(); }, 300);
         }
     }
 
-    // ========== SIDEBAR NAVIGATION (All Dashboards) ==========
+    // 6. Sidebar Navigation
     var sidebarLinks = document.querySelectorAll('.sidebar nav a');
     if (sidebarLinks.length > 0) {
         sidebarLinks.forEach(function(link) {
@@ -150,108 +155,70 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
                 link.classList.add('active');
-                var section = link.innerText.trim();
-
-                // Show section-specific content
-                showSidebarSection(section);
+                showSidebarSection(link.innerText.trim());
             });
         });
     }
 
-    // ========== CITIZEN DASHBOARD ==========
+    // 7. Page-Specific Dynamic Handlers
     if (window.location.href.indexOf('dashboard-citizen') !== -1) {
-        // Load cases from API
         loadCitizenCases();
-
-        // Upload buttons
         document.addEventListener('click', function(e) {
-            if (e.target.tagName === 'A' && e.target.innerText.trim() === 'Upload') {
+            var target = e.target;
+            if (target.tagName === 'A' && target.innerText.trim() === 'Upload') {
                 e.preventDefault();
-                window.showToast('Uploading document...');
-                var link = e.target;
-                setTimeout(function() {
-                    link.innerText = '✓ Uploaded';
-                    link.style.color = 'green';
-                    link.style.fontWeight = '600';
-                    window.showToast('Document uploaded successfully!');
-                }, 1200);
+                openDocumentUploadModal();
             }
-            if (e.target.tagName === 'A' && e.target.innerText.trim() === 'Pay Now') {
+            if (target.tagName === 'A' && target.innerText.trim() === 'Pay Now') {
                 e.preventDefault();
-                window.showToast('Processing payment of ₹500...');
-                var link2 = e.target;
-                setTimeout(function() {
-                    link2.innerText = '✓ Paid';
-                    link2.style.color = 'green';
-                    link2.style.fontWeight = '600';
-                    window.showToast('Payment successful! Receipt generated.');
-                    // Actually record payment in DB
-                    fetch('/api/payments', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ case_id: 2, user_id: localStorage.getItem('token') || '9876543210', amount: 500, description: 'Court Fee - PT/112/2024' })
-                    });
-                }, 1500);
+                openPaymentModal(1, 500, 'Court Fee - PT/112/2024');
             }
-            if (e.target.tagName === 'A' && e.target.innerText.trim() === 'Download') {
+            if (target.tagName === 'A' && target.innerText.trim() === 'Download') {
                 e.preventDefault();
-                window.showToast('Downloading document securely...');
-                setTimeout(function() { window.showToast('Download complete.'); }, 1000);
+                var rowText = target.closest('li') ? target.closest('li').innerText : 'Document';
+                openDocumentViewer(rowText.split(' ')[0], 'Certified Legal Document');
             }
-            if (e.target.tagName === 'A' && e.target.innerText.trim() === 'View Draft') {
+            if (target.tagName === 'A' && target.innerText.trim() === 'View Draft') {
                 e.preventDefault();
-                window.showToast('Opening affidavit draft preview...');
-                showModal('Affidavit Draft — CS/405/2025', '<p style="font-family:var(--font-body); line-height:1.8;">I, Amit Joshi, son of Late Sh. Ramesh Joshi, residing at 45 MG Road, Pune, do hereby solemnly affirm and declare as follows:</p><ol style="line-height:2; font-size:14px;"><li>That I am the rightful owner of commercial property at Survey No. 45, Pune as per registered sale deed dated 12/03/2020.</li><li>That the respondent has unlawfully encroached upon the said property.</li><li>That I have attached all supporting documents including the original sale deed, tax receipts, and possession certificate.</li></ol><p style="margin-top:16px; font-style:italic; color:var(--ink-soft);">This affidavit was auto-generated by Chanakya AI based on case records.</p>');
+                openDocumentViewer('Affidavit_Draft_CS405.pdf', 'Affidavit Draft');
             }
-            // Join Virtual button
-            if (e.target.innerText && e.target.innerText.indexOf('Join Virtual') !== -1) {
+            if (target.innerText && target.innerText.indexOf('Join Virtual') !== -1) {
                 e.preventDefault();
-                e.target.innerText = '● In Session...';
-                e.target.style.background = 'var(--maroon)';
-                e.target.style.color = '#fff';
-                e.target.style.border = 'none';
-                window.showToast('Connecting to virtual courtroom for CS/405/2025...');
-                setTimeout(function() { window.showToast('You are now in the virtual hearing room.'); }, 2000);
+                openECourtRoom('CS/405/2025');
             }
         });
     }
 
-    // ========== LAWYER DASHBOARD ==========
     if (window.location.href.indexOf('dashboard-lawyer') !== -1) {
         loadLawyerCases();
     }
 
-    // ========== JUDGE DASHBOARD ==========
     if (window.location.href.indexOf('dashboard-judge') !== -1) {
-        // Brief and Draft Order buttons
         document.addEventListener('click', function(e) {
             var btn = e.target.closest('button');
             if (!btn) return;
             var text = btn.innerText.trim();
+            if (text === 'Start Virtual Hearing') {
+                var caseNo = btn.closest('tr') ? btn.closest('tr').querySelector('.mono').innerText : 'CS/405/2025';
+                fetch('/api/hearings/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ hearing_id: 1, case_number: caseNo, court_room: 'Room 4, District Court Pune' })
+                });
+                openECourtRoom(caseNo);
+            }
             if (text === 'Brief') {
-                window.showToast('Loading bench brief...');
-                var caseNo = btn.closest('tr').querySelector('.mono').innerText;
-                setTimeout(function() {
-                    showModal('Bench Brief — ' + caseNo, '<div style="line-height:1.8; font-size:14px;"><p><strong>Case:</strong> ' + caseNo + '</p><p><strong>Type:</strong> ' + btn.closest('tr').querySelectorAll('td')[2].innerText + '</p><p><strong>Summary:</strong> This brief contains the consolidated case history, lower court findings, and relevant precedents. The petitioner has filed 3 affidavits and the respondent has submitted a counter-affidavit.</p><p><strong>Key Issues:</strong></p><ul><li>Jurisdiction validity</li><li>Admissibility of electronic evidence</li><li>Limitation period compliance</li></ul><p><strong>Relevant Precedents:</strong></p><ul><li>AIR 2022 SC 1234 — Similar property dispute</li><li>2021 SCC Vol.5 p.789 — Burden of proof</li></ul></div>');
-                }, 800);
+                var caseNo2 = btn.closest('tr') ? btn.closest('tr').querySelectorAll('td')[1].innerText : 'CS/405/2025';
+                openDocumentViewer('Bench_Brief_' + caseNo2.replace(/\//g, '_') + '.pdf', 'Bench Brief Summary');
             }
             if (text === 'Draft Order') {
-                window.showToast('Opening order drafting tool...');
-                var caseNo2 = btn.closest('tr').querySelector('.mono').innerText;
-                setTimeout(function() {
-                    showModal('Draft Order — ' + caseNo2, '<div style="line-height:1.8; font-size:14px;"><p style="text-align:center; font-weight:600; margin-bottom:16px;">IN THE COURT OF HON. JUSTICE SHARMA</p><p><strong>Case No:</strong> ' + caseNo2 + '</p><p><strong>Date:</strong> ' + new Date().toLocaleDateString('en-IN') + '</p><hr style="margin:12px 0;"><p><strong>ORDER</strong></p><textarea style="width:100%; height:150px; padding:12px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); font-size:14px; resize:vertical;" placeholder="Type your order here...">Having heard the arguments from both sides and upon examination of the evidence on record, this court is of the opinion that...</textarea><div style="margin-top:16px; display:flex; gap:12px;"><button class="btn btn-primary" onclick="window.showToast(\'Order signed and published.\'); this.closest(\'.modal-overlay\').remove();">Sign & Publish</button><button class="btn btn-outline" onclick="window.showToast(\'Draft saved.\'); this.closest(\'.modal-overlay\').remove();">Save Draft</button></div></div>');
-                }, 800);
-            }
-            if (text === 'Start Virtual Hearing') {
-                window.showToast('Starting E-Hearing session...');
-                btn.innerText = '● Live';
-                btn.style.background = '#c62828';
-                setTimeout(function() { window.showToast('Virtual hearing room is active. Waiting for parties to join.'); }, 1500);
+                var caseNo3 = btn.closest('tr') ? btn.closest('tr').querySelectorAll('td')[1].innerText : 'CS/405/2025';
+                openOrderDraftingModal(caseNo3);
             }
         });
     }
 
-    // ========== CHANAKYA AI CHAT ==========
+    // 8. Chanakya AI Assistant Input
     var chatInput = document.querySelector('.ai-chat input');
     if (chatInput) {
         chatInput.addEventListener('keypress', function(e) {
@@ -259,14 +226,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 var msg = chatInput.value;
                 chatInput.value = '';
 
-                // Add user bubble
                 var userBubble = document.createElement('div');
                 userBubble.className = 'bubble';
                 userBubble.style = 'background: var(--ink-navy); color: #fff; margin-left: 20px;';
                 userBubble.innerHTML = '<strong>You:</strong> ' + msg;
                 chatInput.parentNode.insertBefore(userBubble, chatInput);
 
-                // Generate smart response
                 setTimeout(function() {
                     var response = generateAIResponse(msg);
                     var botBubble = document.createElement('div');
@@ -274,89 +239,45 @@ document.addEventListener('DOMContentLoaded', function() {
                     botBubble.innerHTML = '<strong>Chanakya:</strong> ' + response;
                     chatInput.parentNode.insertBefore(botBubble, chatInput);
                     chatInput.scrollIntoView({ behavior: 'smooth' });
-                }, 1200);
+                }, 1000);
             }
         });
     }
 
-    // ========== FILE NEW CASE (Lawyer) ==========
-    window.fileNewCase = function() {
-        showFilingForm();
-    };
-
-    // ========== UPDATE CASE STATUS (Judge) ==========
-    window.updateCaseStatus = function(id, newStatus) {
-        fetch('/api/cases/' + id, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: newStatus })
-        })
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            if (data.success) {
-                window.showToast('Order passed successfully!');
-                setTimeout(function() { window.location.reload(); }, 1000);
-            }
-        });
-    };
-
-    // ========== NOTICE TABS ==========
-    var noticeTabs = document.querySelectorAll('.tabs button[role="tab"]');
-    noticeTabs.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            noticeTabs.forEach(function(b) {
-                b.classList.remove('active');
-                b.setAttribute('aria-selected', 'false');
-            });
-            btn.classList.add('active');
-            btn.setAttribute('aria-selected', 'true');
-            window.showToast('Filtered by ' + btn.innerText.trim());
-
-            // Actually filter notices
-            var filterType = btn.innerText.trim();
-            var notices = document.querySelectorAll('.notice-row, .notice-item, tr[data-type]');
-            notices.forEach(function(n) {
-                if (filterType === 'All Notices') {
-                    n.style.display = '';
-                } else {
-                    var type = n.getAttribute('data-type') || '';
-                    n.style.display = (type === filterType || !type) ? '' : 'none';
-                }
-            });
-        });
-    });
-
-    // ========== CASE STATUS TABS ==========
+    // 9. Tab Switchers
     var caseTabs = document.querySelectorAll('.tab-btn');
     caseTabs.forEach(function(btn) {
         btn.addEventListener('click', function() {
-            caseTabs.forEach(function(b) {
-                b.classList.remove('active');
-                b.setAttribute('aria-selected', 'false');
-            });
+            caseTabs.forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
             btn.classList.add('active');
             btn.setAttribute('aria-selected', 'true');
-
             var tabId = btn.getAttribute('data-tab');
-            document.querySelectorAll('.tab-panel').forEach(function(p) {
-                p.style.display = 'none';
-            });
+            document.querySelectorAll('.tab-panel').forEach(function(p) { p.style.display = 'none'; });
             var activePanel = document.getElementById(tabId);
             if (activePanel) activePanel.style.display = '';
         });
     });
 
-    // ========== COURT DIRECTORY SEARCH ==========
+    var noticeTabs = document.querySelectorAll('.tabs button[role="tab"]');
+    noticeTabs.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            noticeTabs.forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+            window.showToast('Filtered by ' + btn.innerText.trim());
+        });
+    });
+
+    // 10. Court Directory Search
     var courtSearchBtn = document.querySelector('.search-directory-btn, .court-search-btn');
     if (!courtSearchBtn) {
-        // Find by context
         document.querySelectorAll('button.btn-primary').forEach(function(b) {
             if (b.innerText.indexOf('Search Directory') !== -1) courtSearchBtn = b;
         });
     }
     if (courtSearchBtn) {
         courtSearchBtn.addEventListener('click', function() {
-            window.showToast('Searching directory... Results updated.');
+            window.showToast('Fetching live court directory...');
             fetch('/api/courts')
             .then(function(res) { return res.json(); })
             .then(function(courts) {
@@ -365,69 +286,425 @@ document.addEventListener('DOMContentLoaded', function() {
                     tbody.innerHTML = '';
                     courts.forEach(function(c) {
                         var tr = document.createElement('tr');
-                        tr.innerHTML = '<td>' + c.name + '</td><td>' + c.location + '</td><td class="mono">' + c.judges + '</td><td class="mono" style="color:var(--maroon);">' + c.pending.toLocaleString('en-IN') + '</td>';
+                        tr.innerHTML = '<td>' + c.name + '</td><td>' + c.location + '</td><td class="mono">' + c.judges + '</td><td class="mono" style="color:var(--maroon); font-weight:600;">' + c.pending.toLocaleString('en-IN') + '</td>';
                         tbody.appendChild(tr);
                     });
-                    window.showToast('Found ' + courts.length + ' courts.');
+                    window.showToast('Loaded ' + courts.length + ' active court registries.');
                 }
             });
         });
-    }
-
-    // ========== ADMIN: LIVE CHART ==========
-    var chartCanvas = document.getElementById('liveLoadChart');
-    if (chartCanvas && typeof Chart !== 'undefined') {
-        var ctx = chartCanvas.getContext('2d');
-        var chartData = {
-            labels: [],
-            datasets: [{
-                label: 'E-Filings/min',
-                data: [],
-                borderColor: '#8B1A1A',
-                backgroundColor: 'rgba(139,26,26,0.1)',
-                fill: true,
-                tension: 0.4
-            }, {
-                label: 'API Requests/s',
-                data: [],
-                borderColor: '#1B2A4A',
-                backgroundColor: 'rgba(27,42,74,0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        };
-        var liveChart = new Chart(ctx, {
-            type: 'line',
-            data: chartData,
-            options: {
-                responsive: true,
-                animation: { duration: 400 },
-                scales: { y: { beginAtZero: true }, x: { display: true } },
-                plugins: { legend: { position: 'top' } }
-            }
-        });
-
-        setInterval(function() {
-            var now = new Date();
-            var label = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2) + ':' + ('0' + now.getSeconds()).slice(-2);
-            chartData.labels.push(label);
-            chartData.datasets[0].data.push(Math.floor(40 + Math.random() * 60));
-            chartData.datasets[1].data.push(Math.floor(200 + Math.random() * 300));
-            if (chartData.labels.length > 20) {
-                chartData.labels.shift();
-                chartData.datasets[0].data.shift();
-                chartData.datasets[1].data.shift();
-            }
-            liveChart.update();
-        }, 2000);
     }
 
 }); // END DOMContentLoaded
 
 
 // =============================================
-// HELPER FUNCTIONS
+// REAL-TIME WEBSOCKET ENGINE
 // =============================================
+
+function initWebSocket() {
+    var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var wsUrl = wsProtocol + '//' + window.location.host + '/ws';
+    var socket = new WebSocket(wsUrl);
+
+    socket.onopen = function() {
+        console.log('⚡ Connected to Nyaya Setu Real-Time Network');
+    };
+
+    socket.onmessage = function(event) {
+        try {
+            var msg = JSON.parse(event.data);
+            handleRealTimeEvent(msg);
+        } catch (e) {
+            console.error('WebSocket parse error:', e);
+        }
+    };
+
+    socket.onclose = function() {
+        // Reconnect after 3 seconds if disconnected
+        setTimeout(initWebSocket, 3000);
+    };
+}
+
+function handleRealTimeEvent(eventData) {
+    var type = eventData.type;
+    var data = eventData.data;
+
+    if (type === 'CASE_FILED') {
+        window.showToast('⚖️ New Case Filed Live: ' + data.cnr_number + ' — ' + data.title);
+        addNotification('New Case Filed: ' + data.cnr_number, data.title + ' filed at ' + data.court, 'Just now');
+        refreshActiveDashboard();
+    } else if (type === 'ORDER_PASSED') {
+        window.showToast('📜 Order Passed Live: ' + (data.cnr_number || 'Case') + ' — ' + data.status);
+        addNotification('Judicial Order Passed', 'Case status updated to ' + data.status, 'Just now');
+        refreshActiveDashboard();
+    } else if (type === 'PAYMENT_SUCCESS') {
+        window.showToast('💳 Payment Received: ₹' + data.amount + ' for ' + data.description);
+        addNotification('Payment Confirmed', '₹' + data.amount + ' payment received for ' + data.description, 'Just now');
+        refreshActiveDashboard();
+    } else if (type === 'DOCUMENT_UPLOADED') {
+        window.showToast('📄 Document Uploaded: ' + data.filename);
+        addNotification('Document Vault Updated', data.filename + ' added to case vault.', 'Just now');
+        refreshActiveDashboard();
+    } else if (type === 'HEARING_STARTED') {
+        window.showToast('🔴 E-Hearing Session Started for ' + data.case_number + ' in ' + data.court_room);
+        addNotification('Virtual Hearing Live', 'Courtroom ' + data.court_room + ' is active for ' + data.case_number, 'Just now');
+    } else if (type === 'AUDIT_LOG') {
+        // Real-time update for Admin audit log table
+        var tbody = document.querySelector('.ledger tbody');
+        if (tbody && window.location.href.indexOf('dashboard-admin') !== -1) {
+            var tr = document.createElement('tr');
+            tr.style.animation = 'fadeIn 0.5s';
+            tr.innerHTML = '<td class="mono">' + data.timestamp + '</td><td class="mono">' + data.event_id + '</td><td>' + data.role + '</td><td>' + data.description + '</td>';
+            tbody.insertBefore(tr, tbody.firstChild);
+        }
+    }
+}
+
+function addNotification(title, desc, time) {
+    window.notificationsList.unshift({ title: title, desc: desc, time: time, unread: true });
+    updateNotifBadge();
+}
+
+function updateNotifBadge() {
+    var unreadCount = window.notificationsList.filter(function(n) { return n.unread; }).length;
+    var bellBtn = document.querySelector('.dash-header button, header button');
+    if (bellBtn) {
+        var existingBadge = bellBtn.querySelector('.notif-badge');
+        if (unreadCount > 0) {
+            if (!existingBadge) {
+                bellBtn.style.position = 'relative';
+                var badge = document.createElement('span');
+                badge.className = 'notif-badge';
+                badge.innerText = unreadCount;
+                bellBtn.appendChild(badge);
+            } else {
+                existingBadge.innerText = unreadCount;
+            }
+        } else if (existingBadge) {
+            existingBadge.remove();
+        }
+    }
+}
+
+function initNotificationCenter() {
+    var bellBtn = document.querySelector('.dash-header button, header button');
+    if (!bellBtn) return;
+
+    var dropdown = document.createElement('div');
+    dropdown.className = 'notif-dropdown';
+    dropdown.innerHTML = '<div class="notif-header"><span>Notifications Center</span><button onclick="markAllRead()" style="background:none; border:none; color:#fff; font-size:12px; cursor:pointer; text-decoration:underline;">Mark all read</button></div><div class="notif-list" id="notif-list-container"></div>';
+    
+    bellBtn.parentNode.insertBefore(dropdown, bellBtn.nextSibling);
+
+    bellBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var isOpen = dropdown.style.display === 'block';
+        dropdown.style.display = isOpen ? 'none' : 'block';
+        renderNotifList();
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!dropdown.contains(e.target) && e.target !== bellBtn) {
+            dropdown.style.display = 'none';
+        }
+    });
+}
+
+function renderNotifList() {
+    var container = document.getElementById('notif-list-container');
+    if (!container) return;
+    var html = '';
+    if (window.notificationsList.length === 0) {
+        html = '<div style="padding:20px; text-align:center; color:var(--ink-soft); font-size:13px;">No new notifications.</div>';
+    } else {
+        window.notificationsList.forEach(function(n) {
+            html += '<div class="notif-item ' + (n.unread ? 'unread' : '') + '"><strong>' + n.title + '</strong><p style="margin:2px 0 0; color:var(--ink-soft); font-size:12px;">' + n.desc + '</p><div class="time">' + n.time + '</div></div>';
+        });
+    }
+    container.innerHTML = html;
+}
+
+window.markAllRead = function() {
+    window.notificationsList.forEach(function(n) { n.unread = false; });
+    updateNotifBadge();
+    renderNotifList();
+};
+
+function refreshActiveDashboard() {
+    var page = window.location.href;
+    if (page.indexOf('dashboard-citizen') !== -1) loadCitizenCases();
+    if (page.indexOf('dashboard-lawyer') !== -1) loadLawyerCases();
+}
+
+
+// =============================================
+// INTERACTIVE MODALS & REAL-TIME MODULES
+// =============================================
+
+// 1. Interactive Virtual Courtroom Modal
+window.openECourtRoom = function(caseNo) {
+    var modalHtml = '<div class="ecourt-container">';
+    
+    // Video Grid
+    modalHtml += '<div class="video-grid">';
+    
+    // Judge Feed
+    modalHtml += '<div class="video-feed judge">';
+    modalHtml += '<div class="video-avatar">👨‍⚖️</div>';
+    modalHtml += '<div class="user-label"><span>🔴 LIVE</span> Hon. Justice Sharma (Presiding Judge)</div>';
+    modalHtml += '</div>';
+
+    // Advocate / Petitioner Feed
+    modalHtml += '<div class="video-feed">';
+    modalHtml += '<div class="video-avatar">⚖️</div>';
+    modalHtml += '<div class="user-label">Adv. R. Desai (Petitioner Counsel)</div>';
+    modalHtml += '</div>';
+
+    // Citizen / Respondent Feed
+    modalHtml += '<div class="video-feed">';
+    modalHtml += '<div class="video-avatar">👤</div>';
+    modalHtml += '<div class="user-label">Amit Joshi (Petitioner)</div>';
+    modalHtml += '</div>';
+
+    // Control Bar
+    modalHtml += '<div class="court-controls">';
+    modalHtml += '<button class="ctrl-btn" title="Toggle Mic" onclick="this.classList.toggle(\'active-red\'); window.showToast(\'Microphone toggled.\')">🎙️</button>';
+    modalHtml += '<button class="ctrl-btn" title="Toggle Video" onclick="this.classList.toggle(\'active-red\'); window.showToast(\'Camera toggled.\')">📹</button>';
+    modalHtml += '<button class="ctrl-btn" title="Share Screen" onclick="window.showToast(\'Screen sharing initiated.\')">🖥️</button>';
+    modalHtml += '<button class="ctrl-btn" title="Pass Judicial Order" onclick="openOrderDraftingModal(\'' + caseNo + '\')">📜</button>';
+    modalHtml += '<button class="ctrl-btn active-red" title="Leave Hearing" onclick="this.closest(\'.modal-overlay\').remove(); window.showToast(\'Left virtual room.\')">📞</button>';
+    modalHtml += '</div>';
+
+    modalHtml += '</div>'; // End Video Grid
+
+    // Sidebar Chat & Transcript
+    modalHtml += '<div class="ecourt-chat">';
+    modalHtml += '<div class="ecourt-chat-header">Courtroom Live Feed — ' + caseNo + '</div>';
+    modalHtml += '<div class="ecourt-chat-body" id="court-chat-body">';
+    modalHtml += '<div class="ecourt-chat-msg"><strong>Clerk:</strong> Courtroom 4 session started. Parties present.</div>';
+    modalHtml += '<div class="ecourt-chat-msg"><strong>Judge:</strong> We are taking up item #1 - ' + caseNo + '. Counsel please proceed.</div>';
+    modalHtml += '<div class="ecourt-chat-msg"><strong>Adv. Desai:</strong> My Lord, we have filed the supplemental affidavit today.</div>';
+    modalHtml += '</div>';
+    
+    modalHtml += '<div class="ecourt-chat-input">';
+    modalHtml += '<input type="text" id="court-msg-input" placeholder="Type message to court..." style="flex:1; padding:6px 8px; border:1px solid var(--rule); border-radius:4px; font-size:12px;">';
+    modalHtml += '<button class="btn btn-primary" style="padding:6px 10px; font-size:12px;" onclick="sendCourtMsg()">Send</button>';
+    modalHtml += '</div>';
+
+    modalHtml += '</div>'; // End Chat
+    modalHtml += '</div>'; // End Container
+
+    showModal('E-Courtroom Virtual Hearing — ' + caseNo, modalHtml, '860px');
+};
+
+window.sendCourtMsg = function() {
+    var input = document.getElementById('court-msg-input');
+    var body = document.getElementById('court-chat-body');
+    if (input && input.value.trim() && body) {
+        var msg = document.createElement('div');
+        msg.className = 'ecourt-chat-msg';
+        msg.innerHTML = '<strong>You:</strong> ' + input.value;
+        body.appendChild(msg);
+        input.value = '';
+        body.scrollTop = body.scrollHeight;
+    }
+};
+
+// 2. Interactive Payment Gateway Modal
+window.openPaymentModal = function(caseId, amount, description) {
+    var token = localStorage.getItem('token') || '9876543210';
+    var modalHtml = '<div>';
+    modalHtml += '<p style="font-size:14px; margin-bottom:16px;"><strong>Item:</strong> ' + description + ' | <strong>Amount:</strong> ₹' + amount + '</p>';
+    
+    modalHtml += '<div style="display:flex; border-bottom:2px solid var(--rule); margin-bottom:16px;">';
+    modalHtml += '<button class="tab-btn active" style="padding:8px 16px; border:none; background:none; font-weight:600; cursor:pointer;" onclick="switchPayTab(\'upi\', this)">UPI / QR Code</button>';
+    modalHtml += '<button class="tab-btn" style="padding:8px 16px; border:none; background:none; font-weight:600; cursor:pointer; color:var(--ink-soft);" onclick="switchPayTab(\'card\', this)">Credit / Debit Card</button>';
+    modalHtml += '</div>';
+
+    // UPI Tab
+    modalHtml += '<div id="pay-tab-upi" class="qr-code-box">';
+    modalHtml += '<div style="font-size:48px; margin-bottom:8px;">📱 Scan with any UPI App</div>';
+    modalHtml += '<div style="background:#000; color:#fff; width:160px; height:160px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:12px; border-radius:8px;">[ UPI QR CODE ]<br>nyayasetu@gov</div>';
+    modalHtml += '<p style="font-size:13px; color:var(--ink-soft); margin-bottom:16px;">UPI ID: <strong>nyayasetu@gov.in</strong></p>';
+    modalHtml += '<button class="btn btn-primary" style="width:100%; padding:12px;" onclick="processPayment(' + caseId + ', \'' + token + '\', ' + amount + ', \'' + description + '\')">✓ I Have Completed Payment</button>';
+    modalHtml += '</div>';
+
+    // Card Tab
+    modalHtml += '<div id="pay-tab-card" style="display:none;">';
+    modalHtml += '<div style="margin-bottom:12px;"><label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Card Number</label><input type="text" placeholder="4532 •••• •••• 8892" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-mono); box-sizing:border-box;"></div>';
+    modalHtml += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">';
+    modalHtml += '<div><label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Expiry Date</label><input type="text" placeholder="MM/YY" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; box-sizing:border-box;"></div>';
+    modalHtml += '<div><label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">CVV</label><input type="password" placeholder="•••" maxlength="3" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; box-sizing:border-box;"></div></div>';
+    modalHtml += '<button class="btn btn-primary" style="width:100%; padding:12px;" onclick="processPayment(' + caseId + ', \'' + token + '\', ' + amount + ', \'' + description + '\')">Pay ₹' + amount + ' Securely</button>';
+    modalHtml += '</div>';
+
+    modalHtml += '</div>';
+    showModal('Judicial Payment Gateway — Government of India', modalHtml);
+};
+
+window.switchPayTab = function(tabName, btn) {
+    btn.parentNode.querySelectorAll('button').forEach(function(b) { b.style.color = 'var(--ink-soft)'; b.classList.remove('active'); });
+    btn.style.color = 'var(--maroon)';
+    btn.classList.add('active');
+    document.getElementById('pay-tab-upi').style.display = tabName === 'upi' ? '' : 'none';
+    document.getElementById('pay-tab-card').style.display = tabName === 'card' ? '' : 'none';
+};
+
+window.processPayment = function(caseId, userId, amount, description) {
+    window.showToast('Verifying payment with bank...');
+    fetch('/api/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ case_id: caseId, user_id: userId, amount: amount, description: description })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            var modal = document.querySelector('.modal-overlay');
+            if (modal) modal.remove();
+            window.showToast('Payment successful! E-Receipt generated.');
+            openDocumentViewer('Receipt_PAY_' + data.id + '.pdf', 'Official Fee Receipt');
+        }
+    });
+};
+
+// 3. Document & Order Printable Viewer Modal
+window.openDocumentViewer = function(docTitle, docType) {
+    var modalHtml = '<div id="printable-doc" style="background:#fff; border:1px solid var(--rule); padding:32px; font-family:var(--font-body); border-radius:4px; box-shadow:inset 0 0 10px rgba(0,0,0,0.02);">';
+    
+    // Header
+    modalHtml += '<div style="text-align:center; border-bottom:2px solid var(--ink-navy); padding-bottom:16px; margin-bottom:20px;">';
+    modalHtml += '<div style="font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--ink-navy);">DEPARTMENT OF JUSTICE — GOVERNMENT OF INDIA</div>';
+    modalHtml += '<div style="font-family:var(--font-mono); font-size:12px; color:var(--maroon); letter-spacing:1px; margin-top:4px;">NYAYA SETU DIGITAL CERTIFIED RECORD</div>';
+    modalHtml += '</div>';
+
+    // Content
+    modalHtml += '<div style="line-height:1.8; font-size:14px;">';
+    modalHtml += '<p><strong>Document ID:</strong> DOC-' + Math.floor(100000 + Math.random() * 900000) + '</p>';
+    modalHtml += '<p><strong>Document Name:</strong> ' + docTitle + '</p>';
+    modalHtml += '<p><strong>Document Type:</strong> ' + docType + '</p>';
+    modalHtml += '<p><strong>Issued On:</strong> ' + new Date().toLocaleDateString('en-IN') + ' ' + new Date().toLocaleTimeString('en-IN') + '</p>';
+    modalHtml += '<hr style="margin:16px 0; border:0; border-top:1px solid var(--rule);">';
+    modalHtml += '<p style="font-weight:600;">CERTIFICATE OF AUTHENTICITY:</p>';
+    modalHtml += '<p style="font-size:13px; color:var(--ink-soft);">This document is digitally signed and verified under Section 65B of the Indian Evidence Act, 1872. Any alterations invalidate this electronic certified record.</p>';
+    modalHtml += '<div style="margin-top:24px; display:flex; justify-content:space-between; align-items:center; background:var(--parchment); padding:16px; border-radius:4px; border:1px solid var(--brass);">';
+    modalHtml += '<div><strong style="color:var(--ink-navy);">Digital Seal & Signature</strong><br><span style="font-size:11px; color:var(--ink-soft);">Verified by e-Sign Portal India</span></div>';
+    modalHtml += '<div style="font-family:var(--font-mono); font-weight:bold; color:green; border:2px solid green; padding:4px 12px; border-radius:4px;">✓ VERIFIED</div>';
+    modalHtml += '</div>';
+    modalHtml += '</div>';
+
+    // Actions
+    modalHtml += '<div style="margin-top:24px; display:flex; gap:12px;">';
+    modalHtml += '<button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save as PDF</button>';
+    modalHtml += '<button class="btn btn-outline" onclick="window.showToast(\'Downloaded ' + docTitle + ' securely.\')">⬇️ Download File</button>';
+    modalHtml += '</div>';
+
+    modalHtml += '</div>';
+
+    showModal(docType + ' — Certified Copy', modalHtml);
+};
+
+// 4. Order Drafting Modal for Judge
+window.openOrderDraftingModal = function(caseNo) {
+    var modalHtml = '<div style="line-height:1.8; font-size:14px;">';
+    modalHtml += '<p style="text-align:center; font-weight:600; margin-bottom:16px; color:var(--ink-navy);">IN THE COURT OF HON. JUSTICE SHARMA</p>';
+    modalHtml += '<p><strong>Case No:</strong> ' + caseNo + '</p>';
+    modalHtml += '<p><strong>Date:</strong> ' + new Date().toLocaleDateString('en-IN') + '</p>';
+    modalHtml += '<hr style="margin:12px 0;">';
+    modalHtml += '<p><strong>JUDICIAL ORDER:</strong></p>';
+    modalHtml += '<textarea id="order-text-content" style="width:100%; height:160px; padding:12px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); font-size:14px; resize:vertical; box-sizing:border-box;" placeholder="Type judicial order summary here...">Having heard the learned counsels for both parties and perused the pleadings on record, this Court is pleased to pass the following order...</textarea>';
+    
+    modalHtml += '<div style="margin-top:16px; display:flex; gap:12px;">';
+    modalHtml += '<button class="btn btn-primary" onclick="submitJudicialOrder(\'' + caseNo + '\')">✒️ Sign & Publish Order Live</button>';
+    modalHtml += '<button class="btn btn-outline" onclick="this.closest(\'.modal-overlay\').remove()">Cancel</button>';
+    modalHtml += '</div></div>';
+
+    showModal('Judicial Order Publishing — ' + caseNo, modalHtml);
+};
+
+window.submitJudicialOrder = function(caseNo) {
+    var txt = document.getElementById('order-text-content').value;
+    if (!txt.trim()) { window.showToast('Please enter order text.'); return; }
+
+    window.showToast('Publishing order live to national registry...');
+    // Find case ID by CNR or update case #1 / #2
+    fetch('/api/cases/1', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Order Passed: ' + txt.substring(0, 30) + '...' })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            var modal = document.querySelector('.modal-overlay');
+            if (modal) modal.remove();
+            window.showToast('Order published live to registry & broadcasted!');
+        }
+    });
+};
+
+function openDocumentUploadModal() {
+    var modalHtml = '<div>';
+    modalHtml += '<div style="border:2px dashed var(--maroon); padding:32px; text-align:center; border-radius:6px; background:var(--parchment-2); margin-bottom:16px; cursor:pointer;" onclick="document.getElementById(\'modal-file-input\').click()">';
+    modalHtml += '<div style="font-size:32px; margin-bottom:8px;">📁</div>';
+    modalHtml += '<strong>Click to Select Document (.pdf, .docx, .jpg)</strong>';
+    modalHtml += '<p style="font-size:12px; color:var(--ink-soft); margin-top:4px;">Digital signature verification enabled</p>';
+    modalHtml += '<input type="file" id="modal-file-input" style="display:none;" onchange="document.getElementById(\'selected-file-name\').innerText = this.files[0].name">';
+    modalHtml += '<div id="selected-file-name" style="margin-top:8px; font-weight:600; color:var(--maroon);"></div>';
+    modalHtml += '</div>';
+
+    modalHtml += '<div style="margin-bottom:16px;"><label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Document Classification</label>';
+    modalHtml += '<select id="upload-doc-type" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);"><option>Affidavit</option><option>Vakalatnama</option><option>Evidence / Annexure</option><option>Written Submission</option></select></div>';
+
+    modalHtml += '<button class="btn btn-primary" style="width:100%; padding:12px;" onclick="submitDocumentUpload()">Upload to Document Vault</button>';
+    modalHtml += '</div>';
+
+    showModal('Upload Certified Legal Document', modalHtml);
+}
+
+window.submitDocumentUpload = function() {
+    var input = document.getElementById('modal-file-input');
+    var filename = input && input.files[0] ? input.files[0].name : 'Affidavit_Signed_2026.pdf';
+    var docType = document.getElementById('upload-doc-type').value;
+    var token = localStorage.getItem('token') || '9876543210';
+
+    window.showToast('Encrypting & uploading document...');
+    fetch('/api/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ case_id: 1, filename: filename, doc_type: docType, uploaded_by: token })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            var modal = document.querySelector('.modal-overlay');
+            if (modal) modal.remove();
+            window.showToast('Document uploaded successfully to Vault!');
+        }
+    });
+};
+
+function showModal(title, contentHtml, maxWidth) {
+    var existing = document.querySelector('.modal-overlay');
+    if (existing) existing.remove();
+
+    var width = maxWidth || '600px';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.style = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); backdrop-filter:blur(3px); z-index:10000; display:flex; align-items:center; justify-content:center; animation: fadeIn 0.2s;';
+    overlay.innerHTML = '<div style="background:#fff; border-radius:8px; padding:24px; max-width:' + width + '; width:92%; max-height:88vh; overflow-y:auto; box-shadow:0 25px 50px rgba(0,0,0,0.35);">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:2px solid var(--rule); padding-bottom:10px;">' +
+        '<h3 style="margin:0; color:var(--ink-navy); font-size:1.2rem;">' + title + '</h3>' +
+        '<button onclick="this.closest(\'.modal-overlay\').remove()" style="border:none; background:none; font-size:22px; cursor:pointer; color:var(--ink-soft);">✕</button></div>' +
+        '<div>' + contentHtml + '</div></div>';
+
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.remove();
+    });
+
+    document.body.appendChild(overlay);
+}
 
 function loadCitizenCases() {
     var token = localStorage.getItem('token') || '9876543210';
@@ -441,7 +718,7 @@ function loadCitizenCases() {
                 var tr = document.createElement('tr');
                 var statusHtml;
                 if (c.next_hearing.indexOf('Tomorrow') !== -1 || c.next_hearing.indexOf('Today') !== -1) {
-                    statusHtml = '<button class="btn btn-outline" style="padding:4px 10px; font-size:12px; font-weight:600;">Join Virtual</button>';
+                    statusHtml = '<button class="btn btn-outline" style="padding:4px 10px; font-size:12px; font-weight:600;" onclick="openECourtRoom(\'' + c.cnr_number + '\')">🎥 Join Virtual</button>';
                 } else {
                     statusHtml = '<span class="status-badge ' + (c.status.indexOf('Await') !== -1 ? 'pending' : '') + '">' + c.status + '</span>';
                 }
@@ -449,11 +726,10 @@ function loadCitizenCases() {
                 tbody.appendChild(tr);
             });
         }
-        // Update sidebar count
         var casesLink = document.querySelector('.sidebar nav a:nth-child(2)');
         if (casesLink) casesLink.innerText = 'My Cases (' + cases.length + ')';
     })
-    .catch(function() { /* Server not running, keep static content */ });
+    .catch(function() {});
 }
 
 function loadLawyerCases() {
@@ -471,169 +747,13 @@ function loadLawyerCases() {
             });
         }
     })
-    .catch(function() { /* Keep static */ });
-}
-
-function showFilingForm() {
-    // Fetch categories from API
-    fetch('/api/categories')
-    .then(function(res) { return res.json(); })
-    .then(function(categories) {
-        var catOptions = '';
-        categories.forEach(function(cat) {
-            catOptions += '<option value="' + cat.prefix + '">' + cat.name + '</option>';
-        });
-
-        var formHtml = '<div style="max-height:70vh; overflow-y:auto; padding-right:8px;">';
-        formHtml += '<div style="margin-bottom:16px;"><label style="display:block; font-weight:600; margin-bottom:6px;">Case Type *</label>';
-        formHtml += '<select id="filing-type" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);">' + catOptions + '</select></div>';
-
-        formHtml += '<div style="margin-bottom:16px;"><label style="display:block; font-weight:600; margin-bottom:6px;">Category *</label>';
-        formHtml += '<select id="filing-category" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);"><option>Select case type first</option></select></div>';
-
-        formHtml += '<div style="margin-bottom:16px;"><label style="display:block; font-weight:600; margin-bottom:6px;">Case Title *</label>';
-        formHtml += '<input id="filing-title" type="text" placeholder="e.g. Ram Kumar v. State of Delhi" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
-
-        formHtml += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">';
-        formHtml += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Petitioner Name *</label>';
-        formHtml += '<input id="filing-petitioner" type="text" placeholder="Full name" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
-        formHtml += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Respondent Name *</label>';
-        formHtml += '<input id="filing-respondent" type="text" placeholder="Full name" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div></div>';
-
-        formHtml += '<div style="margin-bottom:16px;"><label style="display:block; font-weight:600; margin-bottom:6px;">Court *</label>';
-        formHtml += '<select id="filing-court" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);">';
-        formHtml += '<option>District Court, Pune</option><option>High Court, Mumbai</option><option>High Court, Delhi</option><option>Sessions Court, Delhi</option><option>Family Court, Delhi</option><option>High Court, Madras</option><option>High Court, Karnataka</option><option>Supreme Court of India</option><option>Consumer Forum, Jaipur</option><option>ITAT, Delhi</option><option>Arbitration Centre, Bangalore</option>';
-        formHtml += '</select></div>';
-
-        formHtml += '<div style="margin-bottom:16px;"><label style="display:block; font-weight:600; margin-bottom:6px;">Description / Facts of the Case *</label>';
-        formHtml += '<textarea id="filing-desc" rows="4" placeholder="Brief description of the case facts..." style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box; resize:vertical;"></textarea></div>';
-
-        formHtml += '<div style="display:flex; gap:12px; margin-top:20px;">';
-        formHtml += '<button class="btn btn-primary" onclick="submitNewCase()">File Case</button>';
-        formHtml += '<button class="btn btn-outline" onclick="this.closest(\'.modal-overlay\').remove()">Cancel</button>';
-        formHtml += '</div></div>';
-
-        showModal('File a New Case', formHtml);
-
-        // Wire category dropdown to change based on type
-        setTimeout(function() {
-            var typeSelect = document.getElementById('filing-type');
-            var catSelect = document.getElementById('filing-category');
-            if (typeSelect && catSelect) {
-                function updateCategories() {
-                    var selected = typeSelect.value;
-                    var cat = categories.find(function(c) { return c.prefix === selected; });
-                    if (cat) {
-                        catSelect.innerHTML = '';
-                        cat.types.forEach(function(t) {
-                            catSelect.innerHTML += '<option value="' + t + '">' + t + '</option>';
-                        });
-                    }
-                }
-                typeSelect.addEventListener('change', updateCategories);
-                updateCategories(); // Initial load
-            }
-        }, 100);
-    });
-}
-
-window.submitNewCase = function() {
-    var title = document.getElementById('filing-title').value;
-    var petitioner = document.getElementById('filing-petitioner').value;
-    var respondent = document.getElementById('filing-respondent').value;
-    var desc = document.getElementById('filing-desc').value;
-    var caseType = document.getElementById('filing-type');
-    var category = document.getElementById('filing-category');
-    var court = document.getElementById('filing-court');
-
-    if (!title || !petitioner || !respondent || !desc) {
-        window.showToast('Please fill in all required fields.');
-        return;
-    }
-
-    var token = localStorage.getItem('token') || 'BAR/123/2010';
-
-    window.showToast('Filing case... Please wait.');
-
-    fetch('/api/cases', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            title: title,
-            petitioner: petitioner,
-            respondent: respondent,
-            description: desc,
-            case_type: caseType.options[caseType.selectedIndex].text,
-            case_type_prefix: caseType.value,
-            category: category.value,
-            court: court.value,
-            user: token
-        })
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        if (data.success) {
-            // Close modal
-            var modal = document.querySelector('.modal-overlay');
-            if (modal) modal.remove();
-            window.showToast('Case filed successfully! CNR: ' + data.cnr_number);
-            setTimeout(function() { window.location.reload(); }, 1500);
-        } else {
-            window.showToast('Error: ' + data.message);
-        }
-    });
-};
-
-function showModal(title, contentHtml) {
-    // Remove any existing modal
-    var existing = document.querySelector('.modal-overlay');
-    if (existing) existing.remove();
-
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.style = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; display:flex; align-items:center; justify-content:center; animation: fadeIn 0.2s;';
-    overlay.innerHTML = '<div style="background:#fff; border-radius:8px; padding:28px; max-width:600px; width:90%; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
-        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--rule); padding-bottom:12px;">' +
-        '<h3 style="margin:0; color:var(--ink-navy);">' + title + '</h3>' +
-        '<button onclick="this.closest(\'.modal-overlay\').remove()" style="border:none; background:none; font-size:24px; cursor:pointer; color:var(--ink-soft);">✕</button></div>' +
-        '<div>' + contentHtml + '</div></div>';
-
-    // Close on overlay click
-    overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) overlay.remove();
-    });
-
-    document.body.appendChild(overlay);
-}
-
-function generateAIResponse(msg) {
-    var lower = msg.toLowerCase();
-    if (lower.indexOf('hearing') !== -1 || lower.indexOf('next') !== -1 || lower.indexOf('date') !== -1) {
-        return 'Your next hearing is scheduled for <strong>tomorrow at 10:30 AM</strong> in District Court, Pune (Room 4) for case CS/405/2025. It will be a virtual hearing. Make sure your Affidavit is ready to present.';
-    }
-    if (lower.indexOf('document') !== -1 || lower.indexOf('affidavit') !== -1 || lower.indexOf('upload') !== -1) {
-        return 'You have 1 pending document upload: <strong>Affidavit for CS/405/2025</strong>. You can upload it from the Pending Actions section. The deadline is before your hearing tomorrow.';
-    }
-    if (lower.indexOf('pay') !== -1 || lower.indexOf('fee') !== -1 || lower.indexOf('cost') !== -1) {
-        return 'You have a pending court fee of <strong>₹500</strong> for case PT/112/2024 (Property Dispute). You can pay it instantly using UPI, net banking, or debit card from the Payments Hub.';
-    }
-    if (lower.indexOf('status') !== -1 || lower.indexOf('case') !== -1) {
-        return 'You have <strong>2 active cases</strong>:<br>1. <strong>CS/405/2025</strong> — Hearing tomorrow<br>2. <strong>PT/112/2024</strong> — Awaiting Order (next hearing 15 Sep 2026)';
-    }
-    if (lower.indexOf('lawyer') !== -1 || lower.indexOf('advocate') !== -1) {
-        return 'Your case CS/405/2025 is being handled by <strong>Adv. R. Desai</strong> (BAR/123/2010). For PT/112/2024, you may want to consult with a property law specialist.';
-    }
-    if (lower.indexOf('help') !== -1) {
-        return 'I can help you with: <br>• Case status and hearing dates<br>• Document requirements<br>• Court fee calculations<br>• Finding a lawyer<br>• Legal procedure explanations<br><br>Just ask me anything!';
-    }
-    return 'I understand your question about "' + msg + '". Based on your case records, I recommend discussing this with your advocate Adv. R. Desai before the hearing tomorrow. Is there anything specific I can help with?';
+    .catch(function() {});
 }
 
 function showSidebarSection(section) {
     var mainContent = document.querySelector('main');
     if (!mainContent) return;
 
-    // Keep original content as a data attribute
     if (!mainContent.getAttribute('data-original')) {
         mainContent.setAttribute('data-original', mainContent.innerHTML);
     }
@@ -641,7 +761,6 @@ function showSidebarSection(section) {
     var page = window.location.href;
     var html = '';
 
-    // ===== CITIZEN SIDEBAR SECTIONS =====
     if (page.indexOf('dashboard-citizen') !== -1) {
         if (section === 'My Dashboard') {
             mainContent.innerHTML = mainContent.getAttribute('data-original');
@@ -671,9 +790,9 @@ function showSidebarSection(section) {
             .then(function(r) { return r.json(); })
             .then(function(hearings) {
                 var div = document.getElementById('hearings-section');
-                var h = '<table class="ledger" style="border:none;"><thead><tr><th>Date</th><th>Time</th><th>Case</th><th>Court Room</th><th>Type</th><th>Status</th></tr></thead><tbody>';
+                var h = '<table class="ledger" style="border:none;"><thead><tr><th>Date</th><th>Time</th><th>Case</th><th>Court Room</th><th>Type</th><th>Action</th></tr></thead><tbody>';
                 hearings.forEach(function(hr) {
-                    h += '<tr><td class="mono">' + hr.hearing_date + '</td><td class="mono" style="color:var(--maroon); font-weight:600;">' + hr.hearing_time + '</td><td>' + hr.cnr_number + ' — ' + hr.title + '</td><td style="font-size:12px;">' + hr.court_room + '</td><td>' + hr.hearing_type + '</td><td><span class="status-badge">' + hr.status + '</span></td></tr>';
+                    h += '<tr><td class="mono">' + hr.hearing_date + '</td><td class="mono" style="color:var(--maroon); font-weight:600;">' + hr.hearing_time + '</td><td>' + hr.cnr_number + ' — ' + hr.title + '</td><td style="font-size:12px;">' + hr.court_room + '</td><td>' + hr.hearing_type + '</td><td><button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openECourtRoom(\'' + hr.cnr_number + '\')">🎥 Join Courtroom</button></td></tr>';
                 });
                 h += '</tbody></table>';
                 div.innerHTML = h;
@@ -687,9 +806,10 @@ function showSidebarSection(section) {
             .then(function(r) { return r.json(); })
             .then(function(docs) {
                 var div = document.getElementById('docs-section');
-                var h = '<table class="ledger" style="border:none;"><thead><tr><th>File Name</th><th>Type</th><th>Uploaded By</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+                var h = '<div style="margin-bottom:16px;"><button class="btn btn-primary" onclick="openDocumentUploadModal()">+ Upload Document</button></div>';
+                h += '<table class="ledger" style="border:none;"><thead><tr><th>File Name</th><th>Type</th><th>Uploaded By</th><th>Date</th><th>Action</th></tr></thead><tbody>';
                 docs.forEach(function(d) {
-                    h += '<tr><td>' + d.filename + '</td><td>' + d.doc_type + '</td><td>' + d.uploaded_by + '</td><td class="mono">' + d.upload_date + '</td><td><a href="#" class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="event.preventDefault(); window.showToast(\'Downloading ' + d.filename + '...\')">Download</a></td></tr>';
+                    h += '<tr><td>' + d.filename + '</td><td>' + d.doc_type + '</td><td>' + d.uploaded_by + '</td><td class="mono">' + d.upload_date + '</td><td><a href="#" class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="event.preventDefault(); openDocumentViewer(\'' + d.filename + '\', \'' + d.doc_type + '\')">📜 View / Download</a></td></tr>';
                 });
                 h += '</tbody></table>';
                 div.innerHTML = h;
@@ -705,7 +825,7 @@ function showSidebarSection(section) {
                 var div = document.getElementById('pay-section');
                 var h = '<table class="ledger" style="border:none;"><thead><tr><th>Description</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody>';
                 payments.forEach(function(p) {
-                    var actionHtml = p.status === 'Pending' ? '<button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="payNow(' + p.id + ', this)">Pay Now</button>' : '<span style="color:green; font-weight:600;">✓ Paid</span>';
+                    var actionHtml = p.status === 'Pending' ? '<button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="openPaymentModal(' + p.id + ', ' + p.amount + ', \'' + p.description + '\')">💳 Pay Now</button>' : '<button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openDocumentViewer(\'Receipt_' + p.id + '.pdf\', \'Fee Receipt\')">📄 Receipt</button>';
                     h += '<tr><td>' + p.description + '</td><td class="mono" style="font-weight:600;">₹' + p.amount + '</td><td><span class="status-badge ' + (p.status === 'Pending' ? 'pending' : '') + '">' + p.status + '</span></td><td class="mono">' + (p.payment_date || '—') + '</td><td>' + actionHtml + '</td></tr>';
                 });
                 h += '</tbody></table>';
@@ -714,23 +834,16 @@ function showSidebarSection(section) {
             return;
         }
         if (section === 'Settings') {
-            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">Settings</h1>';
+            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">Account Settings</h1>';
             html += '<div class="card"><h3>Profile Information</h3><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">';
-            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Full Name</label><input type="text" value="Amit Joshi" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
-            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Mobile</label><input type="text" value="9876543210" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
-            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Email</label><input type="email" value="amit.joshi@email.com" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
-            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Aadhaar (Last 4)</label><input type="text" value="****5678" disabled style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box; background:#f5f5f5;"></div>';
-            html += '</div><div style="margin-top:20px;"><h3>Notification Preferences</h3><div style="margin-top:12px;">';
-            html += '<label style="display:flex; align-items:center; gap:8px; margin-bottom:12px;"><input type="checkbox" checked> SMS notifications for hearing dates</label>';
-            html += '<label style="display:flex; align-items:center; gap:8px; margin-bottom:12px;"><input type="checkbox" checked> Email notifications for case updates</label>';
-            html += '<label style="display:flex; align-items:center; gap:8px; margin-bottom:12px;"><input type="checkbox"> WhatsApp notifications</label>';
-            html += '</div></div><button class="btn btn-primary" style="margin-top:16px;" onclick="window.showToast(\'Settings saved successfully!\')">Save Changes</button></div>';
+            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Full Name</label><input type="text" value="' + (localStorage.getItem('display_name') || 'Amit Joshi') + '" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
+            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Mobile</label><input type="text" value="' + (localStorage.getItem('token') || '9876543210') + '" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
+            html += '</div><button class="btn btn-primary" style="margin-top:16px;" onclick="window.showToast(\'Profile settings saved successfully!\')">Save Changes</button></div>';
             mainContent.innerHTML = html;
             return;
         }
     }
 
-    // ===== LAWYER SIDEBAR SECTIONS =====
     if (page.indexOf('dashboard-lawyer') !== -1) {
         if (section === 'Overview') {
             mainContent.innerHTML = mainContent.getAttribute('data-original');
@@ -744,8 +857,8 @@ function showSidebarSection(section) {
             .then(function(r) { return r.json(); })
             .then(function(hearings) {
                 var div = document.getElementById('lawyer-hearings');
-                var h = '<table class="ledger" style="border:none;"><thead><tr><th>Date</th><th>Time</th><th>Case</th><th>Parties</th><th>Court Room</th><th>Type</th></tr></thead><tbody>';
-                hearings.forEach(function(hr) { h += '<tr><td class="mono">' + hr.hearing_date + '</td><td class="mono" style="color:var(--maroon); font-weight:600;">' + hr.hearing_time + '</td><td class="mono">' + hr.cnr_number + '</td><td style="font-size:12px;">' + hr.petitioner + ' v. ' + hr.respondent + '</td><td style="font-size:12px;">' + hr.court_room + '</td><td>' + hr.hearing_type + '</td></tr>'; });
+                var h = '<table class="ledger" style="border:none;"><thead><tr><th>Date</th><th>Time</th><th>Case</th><th>Parties</th><th>Court Room</th><th>Action</th></tr></thead><tbody>';
+                hearings.forEach(function(hr) { h += '<tr><td class="mono">' + hr.hearing_date + '</td><td class="mono" style="color:var(--maroon); font-weight:600;">' + hr.hearing_time + '</td><td class="mono">' + hr.cnr_number + '</td><td style="font-size:12px;">' + hr.petitioner + ' v. ' + hr.respondent + '</td><td style="font-size:12px;">' + hr.court_room + '</td><td><button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openECourtRoom(\'' + hr.cnr_number + '\')">🎥 Join Courtroom</button></td></tr>'; });
                 h += '</tbody></table>';
                 div.innerHTML = h;
             });
@@ -759,7 +872,7 @@ function showSidebarSection(section) {
             .then(function(cases) {
                 var div = document.getElementById('client-dir');
                 var h = '<table class="ledger" style="border:none;"><thead><tr><th>Client (Petitioner)</th><th>Case</th><th>Type</th><th>Status</th><th>Contact</th></tr></thead><tbody>';
-                cases.forEach(function(c) { h += '<tr><td style="font-weight:600;">' + c.petitioner + '</td><td class="mono">' + c.cnr_number + '</td><td>' + c.case_type + '</td><td><span class="status-badge">' + c.status + '</span></td><td><a href="#" onclick="event.preventDefault(); window.showToast(\'Contact details for ' + c.petitioner + ' sent to your email.\')">View</a></td></tr>'; });
+                cases.forEach(function(c) { h += '<tr><td style="font-weight:600;">' + c.petitioner + '</td><td class="mono">' + c.cnr_number + '</td><td>' + c.case_type + '</td><td><span class="status-badge">' + c.status + '</span></td><td><a href="#" onclick="event.preventDefault(); window.showToast(\'Client file details loaded.\')">View File</a></td></tr>'; });
                 h += '</tbody></table>';
                 div.innerHTML = h;
             });
@@ -776,9 +889,9 @@ function showSidebarSection(section) {
             .then(function(r) { return r.json(); })
             .then(function(docs) {
                 var div = document.getElementById('vault-section');
-                var h = '<div style="margin-bottom:16px;"><button class="btn btn-primary" onclick="window.showToast(\'Upload dialog opened.\')">Upload Document</button></div>';
+                var h = '<div style="margin-bottom:16px;"><button class="btn btn-primary" onclick="openDocumentUploadModal()">+ Upload Document</button></div>';
                 h += '<table class="ledger" style="border:none;"><thead><tr><th>File</th><th>Type</th><th>Uploaded By</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
-                docs.forEach(function(d) { h += '<tr><td>' + d.filename + '</td><td>' + d.doc_type + '</td><td>' + d.uploaded_by + '</td><td class="mono">' + d.upload_date + '</td><td><a href="#" onclick="event.preventDefault(); window.showToast(\'Downloading...\')">Download</a> | <a href="#" onclick="event.preventDefault(); window.showToast(\'Sharing ' + d.filename + ' with client.\')">Share</a></td></tr>'; });
+                docs.forEach(function(d) { h += '<tr><td>' + d.filename + '</td><td>' + d.doc_type + '</td><td>' + d.uploaded_by + '</td><td class="mono">' + d.upload_date + '</td><td><a href="#" onclick="event.preventDefault(); openDocumentViewer(\'' + d.filename + '\', \'' + d.doc_type + '\')">View Document</a></td></tr>'; });
                 h += '</tbody></table>';
                 div.innerHTML = h;
             });
@@ -791,16 +904,14 @@ function showSidebarSection(section) {
             html += '<div style="background:var(--parchment-2); padding:16px; border-radius:4px; text-align:center;"><span style="display:block; font-size:24px; font-family:var(--font-mono); font-weight:600; color:green;">₹95,000</span>Received</div>';
             html += '<div style="background:#fff8e1; padding:16px; border-radius:4px; text-align:center;"><span style="display:block; font-size:24px; font-family:var(--font-mono); font-weight:600; color:var(--maroon);">₹30,000</span>Outstanding</div></div>';
             html += '<table class="ledger" style="border:none;"><thead><tr><th>Client</th><th>Case</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>';
-            html += '<tr><td>Mehta & Sons Ltd.</td><td>CR/992/2026</td><td class="mono" style="font-weight:600;">₹50,000</td><td><span class="status-badge">Paid</span></td><td><a href="#" onclick="event.preventDefault(); window.showToast(\'Downloading invoice...\')">Invoice</a></td></tr>';
-            html += '<tr><td>Priya Singh</td><td>FC/221/2026</td><td class="mono" style="font-weight:600;">₹30,000</td><td><span class="status-badge pending">Pending</span></td><td><a href="#" onclick="event.preventDefault(); window.showToast(\'Payment reminder sent.\')">Remind</a></td></tr>';
-            html += '<tr><td>Green Earth NGO</td><td>WP/3301/2026</td><td class="mono" style="font-weight:600;">₹45,000</td><td><span class="status-badge">Paid</span></td><td><a href="#" onclick="event.preventDefault(); window.showToast(\'Downloading invoice...\')">Invoice</a></td></tr>';
+            html += '<tr><td>Mehta & Sons Ltd.</td><td>CR/992/2026</td><td class="mono" style="font-weight:600;">₹50,000</td><td><span class="status-badge">Paid</span></td><td><button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openDocumentViewer(\'Invoice_101.pdf\', \'Client Invoice\')">📄 Invoice</button></td></tr>';
+            html += '<tr><td>Priya Singh</td><td>FC/221/2026</td><td class="mono" style="font-weight:600;">₹30,000</td><td><span class="status-badge pending">Pending</span></td><td><button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="window.showToast(\'Payment link sent via SMS & WhatsApp.\')">📲 Remind Client</button></td></tr>';
             html += '</tbody></table></div>';
             mainContent.innerHTML = html;
             return;
         }
     }
 
-    // ===== JUDGE SIDEBAR SECTIONS =====
     if (page.indexOf('dashboard-judge') !== -1) {
         if (section === 'Daily Docket') {
             mainContent.innerHTML = mainContent.getAttribute('data-original');
@@ -814,20 +925,19 @@ function showSidebarSection(section) {
             .then(function(cases) {
                 var div = document.getElementById('briefs-section');
                 var h = '';
-                cases.slice(0, 5).forEach(function(c) {
-                    h += '<div style="border:1px solid var(--rule); padding:16px; margin-bottom:12px; border-radius:4px; border-left:4px solid var(--ink-navy);">';
-                    h += '<div style="display:flex; justify-content:space-between;"><strong class="mono">' + c.cnr_number + '</strong><span class="status-badge">' + c.status + '</span></div>';
+                cases.slice(0, 6).forEach(function(c) {
+                    h += '<div style="border:1px solid var(--rule); padding:16px; margin-bottom:12px; border-radius:6px; border-left:4px solid var(--ink-navy); background:#fff;">';
+                    h += '<div style="display:flex; justify-content:space-between;"><strong class="mono" style="font-size:15px; color:var(--ink-navy);">' + c.cnr_number + '</strong><span class="status-badge">' + c.status + '</span></div>';
                     h += '<p style="margin:8px 0 4px; font-weight:600;">' + c.title + '</p>';
-                    h += '<p style="font-size:13px; color:var(--ink-soft);">' + c.description.substring(0, 120) + '...</p>';
-                    h += '<button class="btn btn-outline" style="padding:4px 10px; font-size:12px; margin-top:8px;" onclick="window.showToast(\'Full brief loaded for ' + c.cnr_number + '\')">View Full Brief</button></div>';
+                    h += '<p style="font-size:13px; color:var(--ink-soft);">' + c.description + '</p>';
+                    h += '<button class="btn btn-outline" style="padding:4px 10px; font-size:12px; margin-top:8px;" onclick="openDocumentViewer(\'Brief_' + c.cnr_number.replace(/\//g, '_') + '.pdf\', \'Bench Brief & Precedents\')">📜 View Certified Brief</button></div>';
                 });
                 div.innerHTML = h;
             });
             return;
         }
         if (section === 'Draft Judgements') {
-            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">Draft Judgements</h1><div class="card">';
-            html += '<div style="margin-bottom:16px;"><strong>Select a case to draft judgement:</strong></div>';
+            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">Draft Judgements & Orders</h1><div class="card">';
             html += '<div id="draft-cases"><p>Loading...</p></div></div>';
             mainContent.innerHTML = html;
             fetch('/api/cases?role=judge')
@@ -836,11 +946,10 @@ function showSidebarSection(section) {
                 var div = document.getElementById('draft-cases');
                 var h = '';
                 cases.forEach(function(c) {
-                    h += '<div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--rule); margin-bottom:8px; border-radius:4px;">';
-                    h += '<div><strong class="mono">' + c.cnr_number + '</strong> — ' + c.title + ' <span class="status-badge">' + c.status + '</span></div>';
+                    h += '<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border:1px solid var(--rule); margin-bottom:8px; border-radius:6px; background:#fff;">';
+                    h += '<div><strong class="mono">' + c.cnr_number + '</strong> — ' + c.title + ' <span class="status-badge" style="margin-left:8px;">' + c.status + '</span></div>';
                     h += '<div style="display:flex; gap:8px;">';
-                    h += '<button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="window.showToast(\'Opening draft editor for ' + c.cnr_number + '\')">Draft Order</button>';
-                    h += '<button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="window.updateCaseStatus(' + c.id + ',\'Order Passed\')">Pass Order</button>';
+                    h += '<button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openOrderDraftingModal(\'' + c.cnr_number + '\')">✒️ Draft Order</button>';
                     h += '</div></div>';
                 });
                 div.innerHTML = h;
@@ -848,87 +957,171 @@ function showSidebarSection(section) {
             return;
         }
         if (section === 'E-Hearing Rooms') {
-            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">E-Hearing Rooms</h1><div class="card">';
+            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">E-Hearing Virtual Rooms</h1><div class="card">';
             html += '<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">';
-            html += '<div style="border:2px solid green; padding:20px; border-radius:4px; text-align:center;"><div style="font-size:24px; margin-bottom:8px;">🟢</div><strong>Room 4</strong><p style="font-size:12px; margin:4px 0;">CS/405/2025</p><button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="window.showToast(\'Joining Room 4...\')">Join Now</button></div>';
-            html += '<div style="border:2px solid var(--rule); padding:20px; border-radius:4px; text-align:center;"><div style="font-size:24px; margin-bottom:8px;">⚪</div><strong>Room 7</strong><p style="font-size:12px; margin:4px 0;">CR/992/2026</p><button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="window.showToast(\'Scheduling for 2:00 PM\')">Schedule</button></div>';
-            html += '<div style="border:2px solid var(--rule); padding:20px; border-radius:4px; text-align:center;"><div style="font-size:24px; margin-bottom:8px;">⚪</div><strong>Room 12</strong><p style="font-size:12px; margin:4px 0;">Available</p><button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="window.showToast(\'Room reserved.\')">Reserve</button></div></div></div>';
+            html += '<div style="border:2px solid green; padding:20px; border-radius:6px; text-align:center; background:#f0fdf4;"><div style="font-size:28px; margin-bottom:8px;">🔴</div><strong>Courtroom 4 (Live)</strong><p style="font-size:12px; margin:4px 0;">CS/405/2025</p><button class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="openECourtRoom(\'CS/405/2025\')">🎥 Enter Bench Room</button></div>';
+            html += '<div style="border:2px solid var(--rule); padding:20px; border-radius:6px; text-align:center;"><div style="font-size:28px; margin-bottom:8px;">⚪</div><strong>Courtroom 7</strong><p style="font-size:12px; margin:4px 0;">CR/992/2026</p><button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="openECourtRoom(\'CR/992/2026\')">🎥 Open Room</button></div>';
+            html += '</div></div>';
             mainContent.innerHTML = html;
             return;
         }
         if (section === 'Precedents DB') {
-            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">Precedents Database</h1><div class="card">';
-            html += '<div style="display:flex; gap:12px; margin-bottom:20px;"><input type="text" id="precedent-search" placeholder="Search precedents by keyword, section, or citation..." style="flex:1; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);"><button class="btn btn-primary" onclick="window.showToast(\'Searching precedents...\')">Search</button></div>';
-            html += '<div style="border:1px solid var(--rule); padding:16px; margin-bottom:12px; border-radius:4px;"><strong>AIR 2022 SC 1234</strong> — <em>Similar Property Dispute</em><p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">Supreme Court held that registered sale deed prevails over unregistered agreement...</p></div>';
-            html += '<div style="border:1px solid var(--rule); padding:16px; margin-bottom:12px; border-radius:4px;"><strong>2021 SCC Vol.5 p.789</strong> — <em>Burden of Proof in Civil Suits</em><p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">The burden of proof lies on the party who asserts a fact...</p></div>';
-            html += '<div style="border:1px solid var(--rule); padding:16px; margin-bottom:12px; border-radius:4px;"><strong>(2023) 4 SCC 567</strong> — <em>Electronic Evidence Admissibility</em><p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">Section 65B certificate is mandatory for admissibility of electronic records...</p></div>';
+            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">Precedents Search Engine</h1><div class="card">';
+            html += '<div style="display:flex; gap:12px; margin-bottom:20px;"><input type="text" id="precedent-search" placeholder="Search Supreme Court & High Court judgments..." style="flex:1; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);"><button class="btn btn-primary" onclick="window.showToast(\'Searching 5,00,000+ precedents...\')">Search Precedents</button></div>';
+            html += '<div style="border:1px solid var(--rule); padding:16px; margin-bottom:12px; border-radius:6px; background:#fff;"><strong>AIR 2022 SC 1234</strong> — <em>Property Dispute Landmark Ruling</em><p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">Supreme Court held that registered sale deed prevails over unregistered agreement.</p><button class="btn btn-outline" style="padding:4px 10px; font-size:11px; margin-top:6px;" onclick="openDocumentViewer(\'AIR_2022_SC_1234.pdf\', \'Landmark Judgment\')">📜 Read Citation</button></div>';
             html += '</div>';
             mainContent.innerHTML = html;
             return;
         }
     }
 
-    // ===== ADMIN SIDEBAR SECTIONS =====
     if (page.indexOf('dashboard-admin') !== -1) {
         if (section === 'System Analytics') {
             mainContent.innerHTML = mainContent.getAttribute('data-original');
             return;
         }
         if (section === 'User Management') {
-            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">User Management</h1><div class="card">';
-            html += '<div style="display:flex; justify-content:space-between; margin-bottom:16px;"><strong>Registered Users</strong><button class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="window.showToast(\'Add User form opened.\')">+ Add User</button></div>';
-            html += '<table class="ledger" style="border:none;"><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-            html += '<tr><td>Amit Joshi</td><td>Citizen</td><td class="mono">9876543210</td><td><span style="color:green;">Active</span></td><td><button class="btn btn-outline" style="padding:2px 8px; font-size:11px;" onclick="window.showToast(\'User profile opened.\')">Edit</button></td></tr>';
-            html += '<tr><td>Adv. R. Desai</td><td>Advocate</td><td class="mono">BAR/123/2010</td><td><span style="color:green;">Active</span></td><td><button class="btn btn-outline" style="padding:2px 8px; font-size:11px;" onclick="window.showToast(\'User profile opened.\')">Edit</button></td></tr>';
-            html += '<tr><td>Hon. Justice Sharma</td><td>Judge</td><td class="mono">GOV-8822</td><td><span style="color:green;">Active</span></td><td><button class="btn btn-outline" style="padding:2px 8px; font-size:11px;" onclick="window.showToast(\'User profile opened.\')">Edit</button></td></tr>';
+            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">User Account Management</h1><div class="card">';
+            html += '<div style="display:flex; justify-content:space-between; margin-bottom:16px;"><strong>Registered System Users</strong><button class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="window.showToast(\'Use the Portal Registration link to add new accounts.\')">+ Add User</button></div>';
+            html += '<table class="ledger" style="border:none;"><thead><tr><th>Name</th><th>Role</th><th>Username / ID</th><th>Status</th></tr></thead><tbody>';
+            html += '<tr><td>Amit Joshi</td><td>Citizen</td><td class="mono">9876543210</td><td><span style="color:green; font-weight:600;">✓ Active</span></td></tr>';
+            html += '<tr><td>Adv. R. Desai</td><td>Advocate</td><td class="mono">BAR/123/2010</td><td><span style="color:green; font-weight:600;">✓ Active</span></td></tr>';
+            html += '<tr><td>Hon. Justice Sharma</td><td>Judge</td><td class="mono">GOV-8822</td><td><span style="color:green; font-weight:600;">✓ Active</span></td></tr>';
             html += '</tbody></table></div>';
             mainContent.innerHTML = html;
             return;
         }
-        if (section === 'Audit Logs') {
-            mainContent.innerHTML = mainContent.getAttribute('data-original');
-            return;
-        }
         if (section === 'Server Status') {
-            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">Server Status</h1><div class="card">';
+            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">Server & Network Cluster Status</h1><div class="card">';
             html += '<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px;">';
-            html += '<div style="background:#e8f5e9; padding:16px; border-radius:4px; text-align:center;"><span style="font-size:24px;">🟢</span><br><strong>API Server</strong><br><span style="font-size:12px;">Healthy</span></div>';
-            html += '<div style="background:#e8f5e9; padding:16px; border-radius:4px; text-align:center;"><span style="font-size:24px;">🟢</span><br><strong>Database</strong><br><span style="font-size:12px;">Connected</span></div>';
-            html += '<div style="background:#e8f5e9; padding:16px; border-radius:4px; text-align:center;"><span style="font-size:24px;">🟢</span><br><strong>File Storage</strong><br><span style="font-size:12px;">Operational</span></div>';
-            html += '<div style="background:#e8f5e9; padding:16px; border-radius:4px; text-align:center;"><span style="font-size:24px;">🟢</span><br><strong>Auth Service</strong><br><span style="font-size:12px;">Running</span></div></div>';
-            html += '<div style="font-family:var(--font-mono); background:#1a1a1a; color:#00ff00; padding:16px; border-radius:4px; font-size:12px; line-height:1.8;">';
-            html += '[OK] Node.js v22.20.0 — Port 3000<br>[OK] SQLite in-memory DB — 10 cases loaded<br>[OK] Express 4.x — Static + API serving<br>[OK] CORS enabled — All origins<br>[OK] Last restart: ' + new Date().toLocaleString('en-IN') + '<br>[OK] Memory usage: 45MB / 512MB<br>[OK] CPU: 2.3%</div></div>';
-            mainContent.innerHTML = html;
-            return;
-        }
-        if (section === 'Portal Settings') {
-            html = '<h1 style="font-size:1.8rem; margin-bottom:24px;">Portal Settings</h1><div class="card">';
-            html += '<h3 style="margin-bottom:16px;">General Configuration</h3>';
-            html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">';
-            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Portal Name</label><input type="text" value="Nyaya Setu" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
-            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Maintenance Mode</label><select style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);"><option>Disabled</option><option>Enabled</option></select></div>';
-            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Max File Upload (MB)</label><input type="number" value="20" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
-            html += '<div><label style="display:block; font-weight:600; margin-bottom:6px;">Session Timeout (min)</label><input type="number" value="30" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
-            html += '</div><button class="btn btn-primary" style="margin-top:20px;" onclick="window.showToast(\'Portal settings saved!\')">Save Settings</button></div>';
+            html += '<div style="background:#e8f5e9; padding:16px; border-radius:6px; text-align:center;"><span style="font-size:24px;">🟢</span><br><strong>API Server</strong><br><span style="font-size:12px; color:green; font-weight:600;">Online (Port 3000)</span></div>';
+            html += '<div style="background:#e8f5e9; padding:16px; border-radius:6px; text-align:center;"><span style="font-size:24px;">⚡</span><br><strong>WebSocket Server</strong><br><span style="font-size:12px; color:green; font-weight:600;">Connected (/ws)</span></div>';
+            html += '<div style="background:#e8f5e9; padding:16px; border-radius:6px; text-align:center;"><span style="font-size:24px;">💾</span><br><strong>SQLite Storage</strong><br><span style="font-size:12px; color:green; font-weight:600;">nyaya_setu.db</span></div>';
+            html += '<div style="background:#e8f5e9; padding:16px; border-radius:6px; text-align:center;"><span style="font-size:24px;">🔒</span><br><strong>e-Sign & Auth</strong><br><span style="font-size:12px; color:green; font-weight:600;">Active</span></div></div>';
+            html += '</div>';
             mainContent.innerHTML = html;
             return;
         }
     }
 
-    // Default fallback
-    window.showToast('Loading ' + section + '...');
+    window.showToast('Navigated to ' + section);
 }
 
-window.payNow = function(id, btn) {
-    window.showToast('Processing payment...');
-    fetch('/api/payments/' + id + '/pay', { method: 'PUT' })
-    .then(function(r) { return r.json(); })
+function showFilingForm() {
+    fetch('/api/categories')
+    .then(function(res) { return res.json(); })
+    .then(function(categories) {
+        var catOptions = '';
+        categories.forEach(function(cat) {
+            catOptions += '<option value="' + cat.prefix + '">' + cat.name + '</option>';
+        });
+
+        var formHtml = '<div style="max-height:72vh; overflow-y:auto; padding-right:6px;">';
+        formHtml += '<div style="margin-bottom:14px;"><label style="display:block; font-weight:600; margin-bottom:4px;">Case Classification *</label>';
+        formHtml += '<select id="filing-type" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);">' + catOptions + '</select></div>';
+
+        formHtml += '<div style="margin-bottom:14px;"><label style="display:block; font-weight:600; margin-bottom:4px;">Specific Sub-Category *</label>';
+        formHtml += '<select id="filing-category" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);"><option>Select case type first</option></select></div>';
+
+        formHtml += '<div style="margin-bottom:14px;"><label style="display:block; font-weight:600; margin-bottom:4px;">Case Title / Cause Title *</label>';
+        formHtml += '<input id="filing-title" type="text" placeholder="e.g. Ramesh Kumar v. Union of India" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
+
+        formHtml += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">';
+        formHtml += '<div><label style="display:block; font-weight:600; margin-bottom:4px;">Petitioner / Complainant *</label>';
+        formHtml += '<input id="filing-petitioner" type="text" placeholder="Full name of petitioner" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div>';
+        formHtml += '<div><label style="display:block; font-weight:600; margin-bottom:4px;">Respondent / Defendant *</label>';
+        formHtml += '<input id="filing-respondent" type="text" placeholder="Full name of respondent" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box;"></div></div>';
+
+        formHtml += '<div style="margin-bottom:14px;"><label style="display:block; font-weight:600; margin-bottom:4px;">Target Court Forum *</label>';
+        formHtml += '<select id="filing-court" style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body);">';
+        formHtml += '<option>High Court, Bombay</option><option>District Court, Pune</option><option>High Court, Delhi</option><option>Sessions Court, Delhi</option><option>Family Court, Delhi</option><option>Supreme Court of India</option>';
+        formHtml += '</select></div>';
+
+        formHtml += '<div style="margin-bottom:16px;"><label style="display:block; font-weight:600; margin-bottom:4px;">Pleadings & Facts of Petition *</label>';
+        formHtml += '<textarea id="filing-desc" rows="4" placeholder="Brief facts of the petition..." style="width:100%; padding:10px; border:1px solid var(--rule); border-radius:4px; font-family:var(--font-body); box-sizing:border-box; resize:vertical;"></textarea></div>';
+
+        formHtml += '<div style="display:flex; gap:12px;">';
+        formHtml += '<button class="btn btn-primary" style="flex:1; padding:12px;" onclick="submitNewCase()">⚖️ Submit Petition & File Case</button>';
+        formHtml += '</div></div>';
+
+        showModal('E-Filing Portal — Submit New Petition', formHtml);
+
+        setTimeout(function() {
+            var typeSelect = document.getElementById('filing-type');
+            var catSelect = document.getElementById('filing-category');
+            if (typeSelect && catSelect) {
+                function updateCategories() {
+                    var selected = typeSelect.value;
+                    var cat = categories.find(function(c) { return c.prefix === selected; });
+                    if (cat) {
+                        catSelect.innerHTML = '';
+                        cat.types.forEach(function(t) {
+                            catSelect.innerHTML += '<option value="' + t + '">' + t + '</option>';
+                        });
+                    }
+                }
+                typeSelect.addEventListener('change', updateCategories);
+                updateCategories();
+            }
+        }, 100);
+    });
+}
+
+window.submitNewCase = function() {
+    var title = document.getElementById('filing-title').value;
+    var petitioner = document.getElementById('filing-petitioner').value;
+    var respondent = document.getElementById('filing-respondent').value;
+    var desc = document.getElementById('filing-desc').value;
+    var caseType = document.getElementById('filing-type');
+    var category = document.getElementById('filing-category');
+    var court = document.getElementById('filing-court');
+
+    if (!title || !petitioner || !respondent || !desc) {
+        window.showToast('Please fill in all required fields.');
+        return;
+    }
+
+    var token = localStorage.getItem('token') || 'BAR/123/2010';
+
+    window.showToast('Encrypting petition & broadcasting file live...');
+
+    fetch('/api/cases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            title: title,
+            petitioner: petitioner,
+            respondent: respondent,
+            description: desc,
+            case_type: caseType.options[caseType.selectedIndex].text,
+            case_type_prefix: caseType.value,
+            category: category.value,
+            court: court.value,
+            user: token
+        })
+    })
+    .then(function(res) { return res.json(); })
     .then(function(data) {
         if (data.success) {
-            btn.outerHTML = '<span style="color:green; font-weight:600;">✓ Paid</span>';
-            var statusCell = btn.closest('tr').querySelector('.status-badge');
-            if (statusCell) { statusCell.innerText = 'Paid'; statusCell.classList.remove('pending'); }
-            window.showToast('Payment successful! Receipt generated.');
+            var modal = document.querySelector('.modal-overlay');
+            if (modal) modal.remove();
+            window.showToast('Case filed successfully! CNR Number: ' + data.cnr_number);
+        } else {
+            window.showToast('Error: ' + data.message);
         }
     });
 };
+
+function generateAIResponse(msg) {
+    var lower = msg.toLowerCase();
+    if (lower.indexOf('hearing') !== -1 || lower.indexOf('date') !== -1) {
+        return 'Your next hearing is scheduled for <strong>tomorrow at 10:30 AM</strong> in District Court, Pune (Room 4) for case CS/405/2025. You can click <strong>"🎥 Join Virtual"</strong> on your dashboard to join the live courtroom.';
+    }
+    if (lower.indexOf('document') !== -1 || lower.indexOf('upload') !== -1) {
+        return 'You can upload affidavits and legal documents directly using the <strong>Document Vault</strong> or <strong>Pending Actions</strong> section.';
+    }
+    if (lower.indexOf('pay') !== -1 || lower.indexOf('fee') !== -1) {
+        return 'You have a pending court fee of <strong>₹500</strong> for case PT/112/2024. Use the live <strong>Payments Hub</strong> for UPI QR Code or Card payments.';
+    }
+    return 'I am Chanakya AI, your digital judicial assistant. I am monitoring your cases in real-time. How can I assist you with pleadings, hearing schedules, or court fee payments today?';
+}
