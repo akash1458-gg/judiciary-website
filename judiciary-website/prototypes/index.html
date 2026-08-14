@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>National Judiciary Portal – Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#f0f5ff', 100: '#e0eaff', 500: '#1e3a8a', 600: '#1e40af', 700: '#1e3a8a', 800: '#1e2a5e', 900: '#0f172a' },
+            accent: { 500: '#b45309', 600: '#92400e' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    .gov-header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Top Bar -->
+  <div class="bg-primary-900 text-white text-sm py-1.5 px-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex gap-4">
+        <span>🇮🇳 National Judiciary Portal</span>
+        <span class="hidden sm:inline">|</span>
+        <span class="hidden sm:inline">Government of India Initiative</span>
+      </div>
+      <div class="flex gap-3 items-center">
+        <button class="hover:underline">English</button>
+        <span>|</span>
+        <button class="hover:underline">हिन्दी</button>
+        <span class="hidden sm:inline">|</span>
+        <a href="#" class="hover:underline hidden sm:inline">Screen Reader</a>
+        <a href="#" class="hover:underline hidden sm:inline">A+</a>
+        <a href="#" class="hover:underline hidden sm:inline">A-</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Header -->
+  <header class="gov-header text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-primary-800 font-bold text-xl shadow">
+            ⚖️
+          </div>
+          <div>
+            <h1 class="text-xl md:text-2xl font-bold tracking-tight">National Judiciary Portal</h1>
+            <p class="text-sm text-blue-200">eCourts Services • Transparent • Accessible • Efficient</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <a href="login.html" class="px-4 py-2 bg-white text-primary-800 rounded font-medium hover:bg-blue-50 transition">Login</a>
+          <a href="register.html" class="px-4 py-2 border border-white rounded font-medium hover:bg-white/10 transition">Register</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-primary-800/80 border-t border-blue-700">
+      <div class="max-w-7xl mx-auto px-4">
+        <ul class="flex flex-wrap gap-1 text-sm font-medium">
+          <li><a href="index.html" class="block px-4 py-3 bg-primary-700 text-white">Home</a></li>
+          <li><a href="case-status.html" class="block px-4 py-3 hover:bg-primary-700 transition">Case Status</a></li>
+          <li><a href="cause-list.html" class="block px-4 py-3 hover:bg-primary-700 transition">Cause List</a></li>
+          <li><a href="judgments.html" class="block px-4 py-3 hover:bg-primary-700 transition">Judgments</a></li>
+          <li><a href="efiling.html" class="block px-4 py-3 hover:bg-primary-700 transition">e-Filing</a></li>
+          <li class="relative group">
+            <a href="#" class="block px-4 py-3 hover:bg-primary-700 transition">Services ▾</a>
+          </li>
+          <li><a href="#" class="block px-4 py-3 hover:bg-primary-700 transition">About</a></li>
+          <li><a href="#" class="block px-4 py-3 hover:bg-primary-700 transition">Help</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero / Quick Search -->
+  <section class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-4 py-10">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-primary-900 mb-2">Access Justice Anytime, Anywhere</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">Search case status, view cause lists, download judgments, and file cases online — all from one secure portal.</p>
+      </div>
+
+      <!-- Quick Search Card -->
+      <div class="max-w-3xl mx-auto bg-primary-50 border border-primary-100 rounded-xl p-6 shadow-sm">
+        <h3 class="font-semibold text-primary-800 mb-4 text-lg">Quick Case Status Search</h3>
+        <form action="case-status.html" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <select class="border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              <option>CNR Number</option>
+              <option>Case Number</option>
+              <option>Party Name</option>
+              <option>Advocate Name</option>
+              <option>FIR Number</option>
+            </select>
+            <input type="text" placeholder="Enter search value..." class="md:col-span-2 border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
+          </div>
+          <div class="flex flex-wrap gap-3 justify-between items-center">
+            <div class="flex gap-2 text-sm">
+              <label class="flex items-center gap-1"><input type="radio" name="court" checked class="text-primary-600" /> District Courts</label>
+              <label class="flex items-center gap-1"><input type="radio" name="court" class="text-primary-600" /> High Courts</label>
+              <label class="flex items-center gap-1"><input type="radio" name="court" class="text-primary-600" /> Supreme Court</label>
+            </div>
+            <button type="submit" class="bg-primary-700 hover:bg-primary-800 text-white px-6 py-2.5 rounded-lg font-medium transition">Search Case</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Grid -->
+  <section class="max-w-7xl mx-auto px-4 py-12">
+    <h2 class="text-xl font-bold text-primary-900 mb-6">Key Services</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <a href="case-status.html" class="bg-white border rounded-xl p-5 hover:shadow-md hover:border-primary-300 transition group">
+        <div class="text-3xl mb-3">🔍</div>
+        <h3 class="font-semibold text-primary-800 group-hover:text-primary-600">Case Status</h3>
+        <p class="text-sm text-gray-500 mt-1">Track any case in real time</p>
+      </a>
+      <a href="cause-list.html" class="bg-white border rounded-xl p-5 hover:shadow-md hover:border-primary-300 transition group">
+        <div class="text-3xl mb-3">📋</div>
+        <h3 class="font-semibold text-primary-800 group-hover:text-primary-600">Cause List</h3>
+        <p class="text-sm text-gray-500 mt-1">Today’s & upcoming hearings</p>
+      </a>
+      <a href="judgments.html" class="bg-white border rounded-xl p-5 hover:shadow-md hover:border-primary-300 transition group">
+        <div class="text-3xl mb-3">📄</div>
+        <h3 class="font-semibold text-primary-800 group-hover:text-primary-600">Judgments</h3>
+        <p class="text-sm text-gray-500 mt-1">Search & download orders</p>
+      </a>
+      <a href="efiling.html" class="bg-white border rounded-xl p-5 hover:shadow-md hover:border-primary-300 transition group">
+        <div class="text-3xl mb-3">📤</div>
+        <h3 class="font-semibold text-primary-800 group-hover:text-primary-600">e-Filing</h3>
+        <p class="text-sm text-gray-500 mt-1">File cases online securely</p>
+      </a>
+      <a href="#" class="bg-white border rounded-xl p-5 hover:shadow-md hover:border-primary-300 transition group">
+        <div class="text-3xl mb-3">💳</div>
+        <h3 class="font-semibold text-primary-800 group-hover:text-primary-600">e-Payment</h3>
+        <p class="text-sm text-gray-500 mt-1">Pay court fees online</p>
+      </a>
+      <a href="#" class="bg-white border rounded-xl p-5 hover:shadow-md hover:border-primary-300 transition group">
+        <div class="text-3xl mb-3">🎥</div>
+        <h3 class="font-semibold text-primary-800 group-hover:text-primary-600">Virtual Courts</h3>
+        <p class="text-sm text-gray-500 mt-1">Join hearings remotely</p>
+      </a>
+      <a href="#" class="bg-white border rounded-xl p-5 hover:shadow-md hover:border-primary-300 transition group">
+        <div class="text-3xl mb-3">👨‍⚖️</div>
+        <h3 class="font-semibold text-primary-800 group-hover:text-primary-600">Advocate Directory</h3>
+        <p class="text-sm text-gray-500 mt-1">Find registered advocates</p>
+      </a>
+      <a href="#" class="bg-white border rounded-xl p-5 hover:shadow-md hover:border-primary-300 transition group">
+        <div class="text-3xl mb-3">📊</div>
+        <h3 class="font-semibold text-primary-800 group-hover:text-primary-600">NJDG Statistics</h3>
+        <p class="text-sm text-gray-500 mt-1">Pendency & disposal data</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Stats Banner -->
+  <section class="bg-primary-800 text-white py-10">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div>
+          <div class="text-3xl font-bold">50M+</div>
+          <div class="text-blue-200 text-sm mt-1">Cases Tracked</div>
+        </div>
+        <div>
+          <div class="text-3xl font-bold">29,000+</div>
+          <div class="text-blue-200 text-sm mt-1">Court Establishments</div>
+        </div>
+        <div>
+          <div class="text-3xl font-bold">1.2 Cr+</div>
+          <div class="text-blue-200 text-sm mt-1">e-Filings</div>
+        </div>
+        <div>
+          <div class="text-3xl font-bold">4.1 Cr+</div>
+          <div class="text-blue-200 text-sm mt-1">Virtual Hearings</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- News & Help -->
+  <section class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-8">
+    <div>
+      <h2 class="text-xl font-bold text-primary-900 mb-4">Latest Notifications</h2>
+      <ul class="bg-white border rounded-xl divide-y">
+        <li class="p-4 hover:bg-gray-50">
+          <a href="#" class="block">
+            <span class="text-xs text-gray-500">14 Aug 2026</span>
+            <p class="font-medium text-primary-800">Revised e-Filing guidelines for High Courts effective from 1 September</p>
+          </a>
+        </li>
+        <li class="p-4 hover:bg-gray-50">
+          <a href="#" class="block">
+            <span class="text-xs text-gray-500">12 Aug 2026</span>
+            <p class="font-medium text-primary-800">Summer vacation schedule and cause list arrangements published</p>
+          </a>
+        </li>
+        <li class="p-4 hover:bg-gray-50">
+          <a href="#" class="block">
+            <span class="text-xs text-gray-500">10 Aug 2026</span>
+            <p class="font-medium text-primary-800">New virtual court links for District Courts – Phase 3 rollout</p>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="text-xl font-bold text-primary-900 mb-4">Need Help?</h2>
+      <div class="bg-white border rounded-xl p-6 space-y-4">
+        <p class="text-gray-600">Common tasks made simple:</p>
+        <ul class="space-y-2 text-sm">
+          <li><a href="#" class="text-primary-700 hover:underline">→ How to find your CNR number</a></li>
+          <li><a href="#" class="text-primary-700 hover:underline">→ Step-by-step e-Filing guide</a></li>
+          <li><a href="#" class="text-primary-700 hover:underline">→ How to join a virtual hearing</a></li>
+          <li><a href="#" class="text-primary-700 hover:underline">→ Download forms & templates</a></li>
+        </ul>
+        <a href="#" class="inline-block mt-2 text-sm font-medium text-primary-700 hover:underline">View all FAQs →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-primary-900 text-blue-100 pt-12 pb-6">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <h4 class="font-semibold text-white mb-3">Services</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white">Case Status</a></li>
+            <li><a href="#" class="hover:text-white">Cause List</a></li>
+            <li><a href="#" class="hover:text-white">e-Filing</a></li>
+            <li><a href="#" class="hover:text-white">Judgments</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-3">About</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white">About the Portal</a></li>
+            <li><a href="#" class="hover:text-white">Organizational Structure</a></li>
+            <li><a href="#" class="hover:text-white">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-3">Legal</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-white">Terms of Use</a></li>
+            <li><a href="#" class="hover:text-white">Disclaimer</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-3">Connect</h4>
+          <ul class="space-y-2 text-sm">
+            <li>Helpline: 1800-XXX-XXXX</li>
+            <li>support@judiciary.gov</li>
+            <li>Working Hours: 9:30 AM – 6:00 PM</li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-blue-800 pt-6 text-center text-sm">
+        <p>© 2026 National Judiciary Portal. All rights reserved. Designed for transparency and access to justice.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

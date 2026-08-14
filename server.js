@@ -50,10 +50,14 @@ db.serialize(() => {
             db.run("INSERT OR IGNORE INTO users (id, role, username, password, display_name) VALUES (2,'advocate','BAR/123/2010','demo','Adv. R. Desai')");
             db.run("INSERT OR IGNORE INTO users (id, role, username, password, display_name) VALUES (3,'judge','GOV-8822','demo','Hon. Justice Sharma')");
             db.run("INSERT OR IGNORE INTO users (id, role, username, password, display_name) VALUES (4,'admin','GOV-8822','demo','System Administrator')");
+            db.run("INSERT OR IGNORE INTO users (id, role, username, password, display_name) VALUES (5,'admin','staff@court.gov','staff123','Court Registrar')");
+            db.run("INSERT OR IGNORE INTO users (id, role, username, password, display_name) VALUES (6,'admin','admin@court.gov','admin123','System Admin')");
+            db.run("INSERT OR IGNORE INTO users (id, role, username, password, display_name) VALUES (7,'advocate','advocate@email.com','advocate123','Adv. Meera Patel')");
+            db.run("INSERT OR IGNORE INTO users (id, role, username, password, display_name) VALUES (8,'citizen','litigant@email.com','litigant123','Rajesh Kumar')");
         }
     });
 
-    // Cases - 10 demo cases
+    // Cases - Demo cases
     db.run(`CREATE TABLE IF NOT EXISTS cases (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
         cnr_number TEXT UNIQUE, 
@@ -83,6 +87,54 @@ db.serialize(() => {
             db.run("INSERT OR IGNORE INTO cases VALUES (8,'MC/101/2026','Anita Sharma v. State','Misc. Application','Consumer Protection','Consumer complaint regarding defective automobile sold by authorized dealer. Refund of Rs. 8.5 Lakh with compensation claimed.','Mediation Ordered','30 Aug 2026','Consumer Forum, Jaipur','9876543210','9876543210','2026-03-22','Anita Sharma','AutoDeal India Pvt. Ltd.')");
             db.run("INSERT OR IGNORE INTO cases VALUES (9,'CR/445/2026','State v. Sunil Yadav','Criminal','Fraud & Cheating','Cheating case under IPC 420. Accused allegedly defrauded 150 investors through fake investment scheme worth Rs. 12 Crore.','Charge Sheet Filed','12 Sep 2026','Sessions Court, Lucknow','BAR/123/2010','BAR/123/2010','2026-06-01','State of UP','Sunil Yadav & Others')");
             db.run("INSERT OR IGNORE INTO cases VALUES (10,'TA/220/2026','Sharma & Associates v. Income Tax Dept','Tax Appeal','Tax Dispute','Appeal against reassessment order under Section 147 of Income Tax Act. Disputed demand of Rs. 1.2 Crore for AY 2023-24.','Hearing Scheduled','8 Sep 2026','ITAT, Delhi','BAR/123/2010','9876543210','2026-07-15','Sharma & Associates','Income Tax Department')");
+            db.run("INSERT OR IGNORE INTO cases VALUES (11,'CS/123/2024','Rajesh Kumar Sharma vs State of Delhi & Ors.','Civil Suit','Property Dispute','Suit for declaration and permanent injunction regarding land rights in South Delhi. Evidence stage ongoing.','Evidence','14 Aug 2026','District Court, New Delhi','advocate@email.com','litigant@email.com','2024-03-10','Rajesh Kumar Sharma','State of Delhi & Ors.')");
+            db.run("INSERT OR IGNORE INTO cases VALUES (12,'CS/456/2023','ABC Pvt Ltd vs Suresh Chand','Civil Suit','Contract Breach','Suit for recovery of Rs. 45 Lakh for breach of commercial supply contract. Final arguments concluded.','Arguments','14 Aug 2026','District Court, New Delhi','BAR/123/2010','litigant@email.com','2023-11-20','ABC Pvt Ltd','Suresh Chand')");
+            db.run("INSERT OR IGNORE INTO cases VALUES (13,'Bail/789/2026','State vs Vikram Singh','Criminal','Bail Application','Application for grant of regular bail under Section 439 CrPC in Saket PS FIR No. 112/2026.','Bail Hearing','14 Aug 2026','Sessions Court, Delhi','BAR/123/2010','litigant@email.com','2026-07-01','State','Vikram Singh')");
+            db.run("INSERT OR IGNORE INTO cases VALUES (14,'WP/112/2025','Citizen Forum vs Municipal Corp','Writ Petition','Environmental','Public interest litigation seeking direction for urgent waste treatment plant setup in East Delhi.','Further Hearing','14 Aug 2026','High Court of Delhi','advocate@email.com','litigant@email.com','2025-05-12','Citizen Forum','Municipal Corporation')");
+            db.run("INSERT OR IGNORE INTO cases VALUES (15,'CS/334/2024','Sunita Devi vs Ramesh Kumar','Civil Suit','Family & Partition','Partition and separate possession suit for ancestral residential property. Witness cross examination scheduled.','Cross Examination','14 Aug 2026','District Court, New Delhi','BAR/123/2010','litigant@email.com','2024-08-18','Sunita Devi','Ramesh Kumar')");
+        }
+    });
+
+    // Advocates Directory Table
+    db.run(`CREATE TABLE IF NOT EXISTS advocates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        enrollment_no TEXT UNIQUE,
+        bar_council TEXT,
+        practice_areas TEXT,
+        courts TEXT,
+        cases_count INTEGER,
+        verified INTEGER
+    )`);
+
+    db.get('SELECT COUNT(*) as cnt FROM advocates', (err, row) => {
+        if (row && row.cnt === 0) {
+            db.run("INSERT OR IGNORE INTO advocates VALUES (1,'Adv. Meera Patel','D/1234/2015','Delhi','Civil, Writ','District Courts, High Court of Delhi',142,1)");
+            db.run("INSERT OR IGNORE INTO advocates VALUES (2,'Adv. R.K. Singh','D/5678/2010','Delhi','Criminal, Bail','District Courts, Sessions',310,1)");
+            db.run("INSERT OR IGNORE INTO advocates VALUES (3,'Adv. Priya Sharma','D/9012/2018','Delhi','Family, Civil','Family Court, District Courts',87,1)");
+            db.run("INSERT OR IGNORE INTO advocates VALUES (4,'Adv. Anil Gupta','D/3456/2008','Delhi','Commercial, Arbitration','High Court of Delhi, Commercial Court',256,1)");
+            db.run("INSERT OR IGNORE INTO advocates VALUES (5,'Adv. Neha Verma','D/7890/2016','Delhi','Civil, Property','District Courts',119,0)");
+            db.run("INSERT OR IGNORE INTO advocates VALUES (6,'Adv. R. Desai','BAR/123/2010','Maharashtra','Corporate, Commercial','High Court of Bombay, District Court Pune',195,1)");
+        }
+    });
+
+    // Judgments & Orders Archive Table
+    db.run(`CREATE TABLE IF NOT EXISTS judgments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        case_no TEXT,
+        court TEXT,
+        judgment_type TEXT,
+        judgment_date TEXT,
+        judge_name TEXT,
+        summary TEXT
+    )`);
+
+    db.get('SELECT COUNT(*) as cnt FROM judgments', (err, row) => {
+        if (row && row.cnt === 0) {
+            db.run("INSERT OR IGNORE INTO judgments VALUES (1,'Rajesh Kumar Sharma vs State of Delhi & Ors.','CS/123/2024','District Court, New Delhi','Interim Order','2026-07-10','Hon’ble Shri A.K. Verma','Interim injunction granted maintaining status quo on property possession.')");
+            db.run("INSERT OR IGNORE INTO judgments VALUES (2,'ABC Pvt Ltd vs Suresh Chand','CS/456/2023','District Court, New Delhi','Final Judgment','2026-06-28','Hon’ble Smt. P. Sharma','Decreed in favor of plaintiff with 9% interest per annum on principal amount.')");
+            db.run("INSERT OR IGNORE INTO judgments VALUES (3,'Citizen Forum vs Municipal Corporation','WP/112/2025','High Court of Delhi','Judgment','2026-06-15','Hon’ble Justices X & Y','Mandamus issued directing municipal authority to complete waste treatment facility within 90 days.')");
         }
     });
 
@@ -382,6 +434,47 @@ app.get('/api/categories', (req, res) => {
         { prefix: 'MC', name: 'Misc. Application', types: ['Consumer Protection','Motor Accident Claim','Environmental','RTI Appeal','Election Petition'] },
         { prefix: 'BA', name: 'Bail Application', types: ['Regular Bail','Anticipatory Bail','Interim Bail','Default Bail'] }
     ]);
+});
+
+// ========== ADVOCATES DIRECTORY API ==========
+app.get('/api/advocates', (req, res) => {
+    const q = req.query.q || '';
+    if (q.trim()) {
+        const param = '%' + q.trim() + '%';
+        db.all('SELECT * FROM advocates WHERE name LIKE ? OR enrollment_no LIKE ? OR practice_areas LIKE ? OR bar_council LIKE ? ORDER BY id ASC', [param, param, param, param], (err, rows) => res.json(rows || []));
+    } else {
+        db.all('SELECT * FROM advocates ORDER BY id ASC', (err, rows) => res.json(rows || []));
+    }
+});
+
+// ========== CAUSE LIST API ==========
+app.get('/api/cause-list', (req, res) => {
+    db.all('SELECT * FROM cases WHERE next_hearing LIKE "%14 Aug%" OR next_hearing LIKE "%Tomorrow%" OR next_hearing LIKE "%Today%" ORDER BY id ASC', (err, rows) => {
+        const causeList = (rows || []).map((c, i) => ({
+            sno: i + 1,
+            caseNo: c.cnr_number,
+            parties: c.petitioner + ' vs ' + c.respondent,
+            purpose: c.status || 'Hearing',
+            advocate: 'Adv. Meera Patel / Counsel'
+        }));
+        res.json({
+            court: 'District Court, New Delhi – Court No. 12',
+            judge: 'Hon’ble Shri A.K. Verma',
+            date: '14 August 2026',
+            items: causeList
+        });
+    });
+});
+
+// ========== JUDGMENTS & ORDERS API ==========
+app.get('/api/judgments', (req, res) => {
+    const q = req.query.q || '';
+    if (q.trim()) {
+        const param = '%' + q.trim() + '%';
+        db.all('SELECT * FROM judgments WHERE title LIKE ? OR case_no LIKE ? OR court LIKE ? OR summary LIKE ? ORDER BY id DESC', [param, param, param, param], (err, rows) => res.json(rows || []));
+    } else {
+        db.all('SELECT * FROM judgments ORDER BY id DESC', (err, rows) => res.json(rows || []));
+    }
 });
 
 // ========== COURTS LIST API ==========

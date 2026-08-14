@@ -180,30 +180,30 @@
     if (role === 'citizen') {
       dynamicFields.innerHTML = `
         <div class="form-group">
-          <label>Mobile Number / Aadhaar</label>
+          <label>Mobile Number / Aadhaar / Email</label>
           <input type="text" placeholder="Enter your registered mobile or Aadhaar" required>
         </div>
         <div class="form-group">
-          <label>OTP</label>
+          <label>Password / OTP</label>
           <div style="display:flex; gap:8px;">
-            <input type="text" placeholder="6-digit code" required style="flex:1;">
+            <input type="password" placeholder="Password or 6-digit OTP" required style="flex:1;">
             <button type="button" class="btn btn-outline" onclick="window.showToast('OTP sent to registered mobile.')">Get OTP</button>
           </div>
-        </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Mobile: <strong>9876543210</strong> | OTP: <strong>123456</strong></div>`;
+        </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Mobile: <strong>9876543210</strong> (OTP: <strong>123456</strong>) | Email: <strong>litigant@email.com</strong> (Pass: <strong>litigant123</strong>)</div>`;
     } else if (role === 'advocate') {
       dynamicFields.innerHTML = `
         <div class="form-group">
-          <label>Bar Council Enrollment ID</label>
-          <input type="text" placeholder="e.g. BAR/123/2010" required>
+          <label>Bar Council Enrollment ID / Email</label>
+          <input type="text" placeholder="e.g. BAR/123/2010 or advocate@email.com" required>
         </div>
         <div class="form-group">
           <label>Password</label>
           <input type="password" placeholder="Enter your password" required>
-        </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Bar ID: <strong>BAR/123/2010</strong> | Password: <strong>demo</strong></div>`;
+        </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Bar ID: <strong>BAR/123/2010</strong> (Pass: <strong>demo</strong>) | Email: <strong>advocate@email.com</strong> (Pass: <strong>advocate123</strong>)</div>`;
     } else {
       dynamicFields.innerHTML = `
         <div class="form-group">
-          <label>Official Gov ID / Nyaya ID</label>
+          <label>Official Gov ID / Nyaya ID / Staff Email</label>
           <input type="text" placeholder="Enter your official ID" required>
         </div>
         <div class="form-group">
@@ -212,8 +212,8 @@
         </div>
         <div class="form-group">
           <label>Hardware Token (2FA)</label>
-          <input type="text" placeholder="Enter token code" required>
-        </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Official ID: <strong>GOV-8822</strong> | Password: <strong>demo</strong> | Token: <strong>0000</strong></div>`;
+          <input type="text" placeholder="Enter token code" required value="0000">
+        </div><div style="margin-top: 12px; font-size: 13px; color: var(--ink-soft);"><em>Demo Credentials:</em><br>Judge: <strong>GOV-8822</strong> (Pass: <strong>demo</strong>) | Staff: <strong>staff@court.gov</strong> (Pass: <strong>staff123</strong>)</div>`;
     }
   }
 

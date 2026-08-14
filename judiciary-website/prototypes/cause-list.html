@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cause List – National Judiciary Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#f0f5ff', 500: '#1e3a8a', 700: '#1e3a8a', 800: '#1e2a5e', 900: '#0f172a' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <div class="bg-primary-900 text-white text-sm py-1.5 px-4">
+    <div class="max-w-7xl mx-auto flex justify-between">
+      <span>🇮🇳 National Judiciary Portal</span>
+      <div class="flex gap-3"><button>English</button><span>|</span><button>हिन्दी</button></div>
+    </div>
+  </div>
+
+  <header class="bg-primary-800 text-white shadow">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-primary-800 font-bold">⚖️</div>
+        <span class="font-bold">National Judiciary Portal</span>
+      </a>
+      <nav class="hidden md:flex gap-1 text-sm">
+        <a href="index.html" class="px-3 py-2 hover:bg-primary-700 rounded">Home</a>
+        <a href="case-status.html" class="px-3 py-2 hover:bg-primary-700 rounded">Case Status</a>
+        <a href="cause-list.html" class="px-3 py-2 bg-primary-700 rounded">Cause List</a>
+        <a href="judgments.html" class="px-3 py-2 hover:bg-primary-700 rounded">Judgments</a>
+        <a href="efiling.html" class="px-3 py-2 hover:bg-primary-700 rounded">e-Filing</a>
+      </nav>
+      <a href="#" class="text-sm px-3 py-1.5 border border-white/50 rounded">Login</a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-primary-900 mb-6">Cause List</h1>
+
+    <div class="bg-white border rounded-xl p-6 shadow-sm mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Court Level</label>
+          <select class="w-full border rounded-lg px-3 py-2.5">
+            <option>District Courts</option>
+            <option>High Courts</option>
+            <option>Supreme Court</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">State / Court</label>
+          <select class="w-full border rounded-lg px-3 py-2.5">
+            <option>Delhi</option>
+            <option>Maharashtra</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Date</label>
+          <input type="date" value="2026-08-14" class="w-full border rounded-lg px-3 py-2.5" />
+        </div>
+        <div class="flex items-end">
+          <button class="w-full bg-primary-700 hover:bg-primary-800 text-white py-2.5 rounded-lg font-medium">Show Cause List</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sample Cause List -->
+    <div class="bg-white border rounded-xl overflow-hidden shadow-sm">
+      <div class="bg-primary-50 px-6 py-4 border-b flex justify-between items-center">
+        <div>
+          <h2 class="font-bold text-primary-900">District Court, New Delhi – Court No. 12</h2>
+          <p class="text-sm text-gray-600">Hon’ble Shri A.K. Verma • 14 August 2026</p>
+        </div>
+        <button class="text-sm px-3 py-1.5 border rounded hover:bg-white">Download PDF</button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-left">
+            <tr>
+              <th class="px-4 py-3 font-medium">S.No</th>
+              <th class="px-4 py-3 font-medium">Case No.</th>
+              <th class="px-4 py-3 font-medium">Parties</th>
+              <th class="px-4 py-3 font-medium">Purpose</th>
+              <th class="px-4 py-3 font-medium">Advocate</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y">
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3">1</td>
+              <td class="px-4 py-3 font-mono text-primary-700">CS/123/2024</td>
+              <td class="px-4 py-3">Rajesh Kumar Sharma vs State of Delhi</td>
+              <td class="px-4 py-3">Evidence</td>
+              <td class="px-4 py-3">Adv. Meera Patel</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3">2</td>
+              <td class="px-4 py-3 font-mono text-primary-700">CS/456/2023</td>
+              <td class="px-4 py-3">Suresh Chand vs ABC Pvt Ltd</td>
+              <td class="px-4 py-3">Arguments</td>
+              <td class="px-4 py-3">Adv. R.K. Singh</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3">3</td>
+              <td class="px-4 py-3 font-mono text-primary-700">Bail/789/2026</td>
+              <td class="px-4 py-3">State vs Vikram Singh</td>
+              <td class="px-4 py-3">Bail Application</td>
+              <td class="px-4 py-3">Adv. Priya Sharma</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3">4</td>
+              <td class="px-4 py-3 font-mono text-primary-700">WP/112/2025</td>
+              <td class="px-4 py-3">Citizen Forum vs Municipal Corp</td>
+              <td class="px-4 py-3">Further Hearing</td>
+              <td class="px-4 py-3">Adv. Anil Gupta</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3">5</td>
+              <td class="px-4 py-3 font-mono text-primary-700">CS/334/2024</td>
+              <td class="px-4 py-3">Sunita Devi vs Ramesh Kumar</td>
+              <td class="px-4 py-3">Cross Examination</td>
+              <td class="px-4 py-3">Adv. Neha Verma</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-primary-900 text-blue-100 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm">© 2026 National Judiciary Portal</div>
+  </footer>
+</body>
+</html>

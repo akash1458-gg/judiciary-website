@@ -146,12 +146,12 @@
       <div class="section-head" style="margin-bottom: 20px;">
         <div>
           <span class="eyebrow">Results</span>
-          <h2>Courts in Ahmedabad, Gujarat</h2>
+          <h2>Courts & Registry Directory</h2>
         </div>
       </div>
 
       <table class="ledger">
-        <caption>Showing 4 of 12 courts Â· last updated 10 Aug 2026</caption>
+        <caption>Showing active court complexes · live registry connection</caption>
         <thead>
           <tr>
             <th>Court Code</th>
@@ -177,21 +177,140 @@
             <td><span class="status-badge disposed" style="background:#E4EEE6; color:var(--ok);">Active</span></td>
           </tr>
           <tr>
-            <td class="mono">GJ-AHM-05</td>
-            <td>Family Court, Ahmedabad<br><span style="font-size: 12px; color: var(--ink-soft);">Navrangpura</span></td>
-            <td>Ahmedabad City & Rural</td>
-            <td>familycourt.ahmd@nyayasetu.gov.in<br>079-26569090</td>
-            <td><span class="status-badge pending" style="background:#F5E9D6; color:var(--pending);">Rollout Pending</span></td>
+            <td class="mono">DL-NDH-12</td>
+            <td>District Court, New Delhi — Court No. 12<br><span style="font-size: 12px; color: var(--ink-soft);">Patiala House Courts</span></td>
+            <td>New Delhi Jurisdiction</td>
+            <td>registry.ndh12@nyayasetu.gov.in<br>011-23381234</td>
+            <td><span class="status-badge disposed" style="background:#E4EEE6; color:var(--ok);">Active</span></td>
           </tr>
           <tr>
-            <td class="mono">GJ-AHM-08</td>
-            <td>Metropolitan Magistrate Courts<br><span style="font-size: 12px; color: var(--ink-soft);">Gheekanta</span></td>
-            <td>Ahmedabad City</td>
-            <td>metro.gheekanta@nyayasetu.gov.in<br>079-25324545</td>
+            <td class="mono">MH-BOM-01</td>
+            <td>High Court of Judicature at Bombay<br><span style="font-size: 12px; color: var(--ink-soft);">Fort, Mumbai</span></td>
+            <td>State of Maharashtra</td>
+            <td>registrar.highcourt@nyayasetu.gov.in<br>022-22670000</td>
             <td><span class="status-badge disposed" style="background:#E4EEE6; color:var(--ok);">Active</span></td>
           </tr>
         </tbody>
       </table>
+
+      <!-- Daily Cause List Section -->
+      <div style="margin-top: 48px;">
+        <div class="section-head" style="margin-bottom: 20px;">
+          <div>
+            <span class="eyebrow">Daily Docket</span>
+            <h2>Live Cause List — District Court New Delhi (Court No. 12)</h2>
+            <p style="font-size:14px; color:var(--ink-soft); margin-top:4px;">Hon’ble Shri A.K. Verma • 14 August 2026</p>
+          </div>
+          <button class="btn btn-outline" onclick="openDocumentViewer('Cause_List_Court12_14Aug2026.pdf', 'Daily Cause List')">📄 Download Certified PDF</button>
+        </div>
+
+        <table class="ledger" style="background:#fff;">
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Case No.</th>
+              <th>Parties</th>
+              <th>Purpose</th>
+              <th>Advocate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">1</td>
+              <td class="mono" style="font-weight:600; color:var(--ink-navy);">CS/123/2024</td>
+              <td>Rajesh Kumar Sharma vs State of Delhi & Ors.</td>
+              <td>Evidence Stage</td>
+              <td>Adv. Meera Patel</td>
+            </tr>
+            <tr>
+              <td class="mono">2</td>
+              <td class="mono" style="font-weight:600; color:var(--ink-navy);">CS/456/2023</td>
+              <td>ABC Pvt Ltd vs Suresh Chand</td>
+              <td>Final Arguments</td>
+              <td>Adv. R.K. Singh</td>
+            </tr>
+            <tr>
+              <td class="mono">3</td>
+              <td class="mono" style="font-weight:600; color:var(--ink-navy);">Bail/789/2026</td>
+              <td>State vs Vikram Singh</td>
+              <td>Bail Application</td>
+              <td>Adv. Priya Sharma</td>
+            </tr>
+            <tr>
+              <td class="mono">4</td>
+              <td class="mono" style="font-weight:600; color:var(--ink-navy);">WP/112/2025</td>
+              <td>Citizen Forum vs Municipal Corp</td>
+              <td>Further Hearing</td>
+              <td>Adv. Anil Gupta</td>
+            </tr>
+            <tr>
+              <td class="mono">5</td>
+              <td class="mono" style="font-weight:600; color:var(--ink-navy);">CS/334/2024</td>
+              <td>Sunita Devi vs Ramesh Kumar</td>
+              <td>Cross Examination</td>
+              <td>Adv. Neha Verma</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Advocate Directory Section -->
+      <div style="margin-top: 48px; margin-bottom: 40px;">
+        <div class="section-head" style="margin-bottom: 20px;">
+          <div>
+            <span class="eyebrow">Bar Directory</span>
+            <h2>Advocate Directory</h2>
+            <p style="font-size:14px; color:var(--ink-soft); margin-top:4px;">Verified Bar Council enrolled advocates</p>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px;" id="advocate-cards-container">
+          <div style="background:#fff; border:1px solid var(--rule); padding:16px; border-radius:6px; border-top:4px solid var(--ink-navy);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:15px; color:var(--ink-navy);">Adv. Meera Patel</strong>
+              <span class="status-badge disposed" style="background:#E4EEE6; color:var(--ok); font-size:10px;">Verified</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:12px; color:var(--maroon); margin-top:4px;">Enrollment: D/1234/2015 (Delhi Bar)</div>
+            <div style="font-size:13px; color:var(--ink-soft); margin-top:8px;"><strong>Practice Areas:</strong> Civil, Writ</div>
+            <div style="font-size:12px; color:var(--ink-soft); margin-top:4px;">District Courts, High Court of Delhi</div>
+            <div style="margin-top:12px; font-size:12px; font-weight:600;">142 cases on record</div>
+          </div>
+
+          <div style="background:#fff; border:1px solid var(--rule); padding:16px; border-radius:6px; border-top:4px solid var(--ink-navy);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:15px; color:var(--ink-navy);">Adv. R.K. Singh</strong>
+              <span class="status-badge disposed" style="background:#E4EEE6; color:var(--ok); font-size:10px;">Verified</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:12px; color:var(--maroon); margin-top:4px;">Enrollment: D/5678/2010 (Delhi Bar)</div>
+            <div style="font-size:13px; color:var(--ink-soft); margin-top:8px;"><strong>Practice Areas:</strong> Criminal, Bail</div>
+            <div style="font-size:12px; color:var(--ink-soft); margin-top:4px;">District Courts, Sessions</div>
+            <div style="margin-top:12px; font-size:12px; font-weight:600;">310 cases on record</div>
+          </div>
+
+          <div style="background:#fff; border:1px solid var(--rule); padding:16px; border-radius:6px; border-top:4px solid var(--ink-navy);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:15px; color:var(--ink-navy);">Adv. Priya Sharma</strong>
+              <span class="status-badge disposed" style="background:#E4EEE6; color:var(--ok); font-size:10px;">Verified</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:12px; color:var(--maroon); margin-top:4px;">Enrollment: D/9012/2018 (Delhi Bar)</div>
+            <div style="font-size:13px; color:var(--ink-soft); margin-top:8px;"><strong>Practice Areas:</strong> Family, Civil</div>
+            <div style="font-size:12px; color:var(--ink-soft); margin-top:4px;">Family Court, District Courts</div>
+            <div style="margin-top:12px; font-size:12px; font-weight:600;">87 cases on record</div>
+          </div>
+
+          <div style="background:#fff; border:1px solid var(--rule); padding:16px; border-radius:6px; border-top:4px solid var(--ink-navy);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:15px; color:var(--ink-navy);">Adv. Anil Gupta</strong>
+              <span class="status-badge disposed" style="background:#E4EEE6; color:var(--ok); font-size:10px;">Verified</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:12px; color:var(--maroon); margin-top:4px;">Enrollment: D/3456/2008 (Delhi Bar)</div>
+            <div style="font-size:13px; color:var(--ink-soft); margin-top:8px;"><strong>Practice Areas:</strong> Commercial, Arbitration</div>
+            <div style="font-size:12px; color:var(--ink-soft); margin-top:4px;">High Court of Delhi, Commercial Court</div>
+            <div style="margin-top:12px; font-size:12px; font-weight:600;">256 cases on record</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 </main>

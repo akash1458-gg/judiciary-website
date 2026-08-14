@@ -112,8 +112,58 @@
         </div>
       </div>
       
-      <div style="margin-top: 24px; text-align: center;">
-        <button class="btn btn-outline" type="button" onclick="window.showToast('Loading older notices...')">Load More</button>
+      <div style="margin-top: 24px; text-align: center; margin-bottom: 48px;">
+        <button class="btn btn-outline" type="button" onclick="window.showToast('Loading older notices...')">Load More Notices</button>
+      </div>
+
+      <!-- Judgments & Orders Archive Section -->
+      <div style="margin-bottom: 40px;">
+        <div class="section-head" style="margin-bottom: 20px;">
+          <div>
+            <span class="eyebrow">Public Records</span>
+            <h2>Judgments & Orders Archive</h2>
+            <p style="font-size:14px; color:var(--ink-soft); margin-top:4px;">Search certified court judgments and interim orders</p>
+          </div>
+        </div>
+
+        <div style="background:#fff; border:1px solid var(--rule); border-radius:8px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
+          <div style="padding:16px 20px; background:var(--parchment); border-bottom:1px solid var(--rule); display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13px; font-weight:600; color:var(--ink-navy);">Live Legal Archive Connection</span>
+            <button class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="window.showToast('Filter options active.')">🔍 Filter Judgments</button>
+          </div>
+
+          <div style="divide-y:1px solid var(--rule);">
+            <div style="padding:20px; border-bottom:1px solid var(--parchment-2); display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+              <div>
+                <strong style="font-size:16px; color:var(--ink-navy); font-family:var(--font-display);">Rajesh Kumar Sharma vs State of Delhi & Ors.</strong>
+                <p style="font-size:13px; color:var(--ink-soft); margin:4px 0 2px;"><strong>Case No:</strong> CS/123/2024 • <strong>Court:</strong> District Court, New Delhi • <strong>Type:</strong> Interim Order</p>
+                <p style="font-size:12px; color:var(--ink-soft);"><strong>Date:</strong> 10 Jul 2026 • <strong>Judge:</strong> Hon’ble Shri A.K. Verma</p>
+                <p style="font-size:13px; margin-top:6px;"><em>Summary: Interim injunction granted maintaining status quo on property possession.</em></p>
+              </div>
+              <button class="btn btn-outline" style="padding:6px 12px; font-size:12px; white-space:nowrap;" onclick="openDocumentViewer('Judgment_CS123_2024.pdf', 'Certified Judgment Order')">📜 View / Download PDF</button>
+            </div>
+
+            <div style="padding:20px; border-bottom:1px solid var(--parchment-2); display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+              <div>
+                <strong style="font-size:16px; color:var(--ink-navy); font-family:var(--font-display);">ABC Pvt Ltd vs Suresh Chand</strong>
+                <p style="font-size:13px; color:var(--ink-soft); margin:4px 0 2px;"><strong>Case No:</strong> CS/456/2023 • <strong>Court:</strong> District Court, New Delhi • <strong>Type:</strong> Final Judgment</p>
+                <p style="font-size:12px; color:var(--ink-soft);"><strong>Date:</strong> 28 Jun 2026 • <strong>Judge:</strong> Hon’ble Smt. P. Sharma</p>
+                <p style="font-size:13px; margin-top:6px;"><em>Summary: Decreed in favor of plaintiff with 9% interest per annum on principal amount.</em></p>
+              </div>
+              <button class="btn btn-outline" style="padding:6px 12px; font-size:12px; white-space:nowrap;" onclick="openDocumentViewer('Judgment_CS456_2023.pdf', 'Certified Final Judgment')">📜 View / Download PDF</button>
+            </div>
+
+            <div style="padding:20px; display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+              <div>
+                <strong style="font-size:16px; color:var(--ink-navy); font-family:var(--font-display);">Citizen Forum vs Municipal Corporation</strong>
+                <p style="font-size:13px; color:var(--ink-soft); margin:4px 0 2px;"><strong>Case No:</strong> WP/112/2025 • <strong>Court:</strong> High Court of Delhi • <strong>Type:</strong> PIL Judgment</p>
+                <p style="font-size:12px; color:var(--ink-soft);"><strong>Date:</strong> 15 Jun 2026 • <strong>Bench:</strong> Hon’ble Justices X & Y</p>
+                <p style="font-size:13px; margin-top:6px;"><em>Summary: Mandamus issued directing municipal authority to complete waste treatment facility within 90 days.</em></p>
+              </div>
+              <button class="btn btn-outline" style="padding:6px 12px; font-size:12px; white-space:nowrap;" onclick="openDocumentViewer('Judgment_WP112_2025.pdf', 'Certified High Court Judgment')">📜 View / Download PDF</button>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>

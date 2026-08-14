@@ -1,0 +1,320 @@
+// Prisma schema outline for Judiciary Website
+// This is a comprehensive starting point – refine based on jurisdiction rules
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PUBLIC
+  LITIGANT
+  ADVOCATE
+  COURT_STAFF
+  JUDGE
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum CaseStatus {
+  FILED
+  REGISTERED
+  PENDING
+  ADMITTED
+  HEARING
+  RESERVED
+  DISPOSED
+  DISMISSED
+  WITHDRAWN
+  TRANSFERRED
+}
+
+enum PartyType {
+  PETITIONER
+  RESPONDENT
+  APPELLANT
+  APPLICANT
+  OPPOSITE_PARTY
+  OTHER
+}
+
+enum FilingStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_SCRUTINY
+  ACCEPTED
+  RETURNED
+  REJECTED
+  REGISTERED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  mobile        String?   @unique
+  passwordHash  String?
+  name          String
+  role          UserRole  @default(LITIGANT)
+  isVerified    Boolean   @default(false)
+  kycStatus     String?   // pending, verified, rejected
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  advocate      Advocate?
+  filings       Filing[]
+  payments      Payment[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  @@index([email])
+  @@index([mobile])
+}
+
+model Advocate {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  enrollmentNo    String   @unique
+  barCouncil      String?
+  practiceCourts  String[] // array of court IDs or names
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  caseAdvocates   CaseAdvocate[]
+}
+
+model CourtComplex {
+  id          String   @id @default(cuid())
+  name        String
+  address     String?
+  district    String?
+  state       String?
+  latitude    Float?
+  longitude   Float?
+  contact     String?
+  courts      Court[]
+}
+
+model Court {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   // District, High Court, Supreme, Tribunal etc.
+  complexId     String?
+  complex       CourtComplex? @relation(fields: [complexId], references: [id])
+  jurisdiction  String?
+  isActive      Boolean  @default(true)
+
+  cases         Case[]
+  causeLists    CauseList[]
+  judges        Judge[]
+}
+
+model Judge {
+  id          String   @id @default(cuid())
+  name        String
+  designation String?
+  courtId     String?
+  court       Court?   @relation(fields: [courtId], references: [id])
+  isActive    Boolean  @default(true)
+
+  hearings    Hearing[]
+}
+
+model Case {
+  id              String     @id @default(cuid())
+  cnr             String     @unique // Case Number Record
+  caseNumber      String
+  caseType        String
+  filingDate      DateTime?
+  registrationDate DateTime?
+  status          CaseStatus @default(FILED)
+  stage           String?
+  courtId         String
+  court           Court      @relation(fields: [courtId], references: [id])
+  nextHearingDate DateTime?
+  disposedDate    DateTime?
+  subject         String?    // short description
+  acts            String[]   // related acts
+
+  parties         CaseParty[]
+  advocates       CaseAdvocate[]
+  hearings        Hearing[]
+  orders          OrderJudgment[]
+  filings         Filing[]
+  documents       Document[]
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([cnr])
+  @@index([caseNumber, courtId])
+  @@index([status])
+  @@index([nextHearingDate])
+}
+
+model CaseParty {
+  id        String    @id @default(cuid())
+  caseId    String
+  case      Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  name      String
+  type      PartyType
+  address   String?
+  age       Int?
+  gender    String?
+
+  @@index([name])
+  @@index([caseId])
+}
+
+model CaseAdvocate {
+  id          String   @id @default(cuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  advocateId  String?
+  advocate    Advocate? @relation(fields: [advocateId], references: [id])
+  name        String?  // if not linked to registered advocate
+  side        String   // Petitioner / Respondent etc.
+  isLead      Boolean  @default(false)
+}
+
+model Hearing {
+  id          String   @id @default(cuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  hearingDate DateTime
+  stage       String?
+  judgeId     String?
+  judge       Judge?   @relation(fields: [judgeId], references: [id])
+  courtroom   String?
+  purpose     String?
+  remarks     String?
+  isCompleted Boolean  @default(false)
+
+  @@index([hearingDate])
+  @@index([caseId])
+}
+
+model OrderJudgment {
+  id          String   @id @default(cuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  orderDate   DateTime
+  type        String   // Interim, Final, Judgment, etc.
+  title       String?
+  pdfUrl      String
+  isFinal     Boolean  @default(false)
+  publishedAt DateTime?
+  uploadedBy  String?
+
+  @@index([orderDate])
+  @@index([caseId])
+}
+
+model Filing {
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  caseId        String?
+  case          Case?        @relation(fields: [caseId], references: [id])
+  filingType    String       // New Case, Application, Document etc.
+  status        FilingStatus @default(DRAFT)
+  caseType      String?
+  subject       String?
+  feeAmount     Decimal?
+  paymentId     String?
+  submittedAt   DateTime?
+  acceptedAt    DateTime?
+  cnrGenerated  String?      // after acceptance
+  remarks       String?
+
+  documents     Document[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  filingId    String?
+  filing      Filing?  @relation(fields: [filingId], references: [id])
+  caseId      String?
+  case        Case?    @relation(fields: [caseId], references: [id])
+  fileName    String
+  fileUrl     String
+  fileType    String
+  fileSize    Int?
+  uploadedAt  DateTime @default(now())
+  isPublic    Boolean  @default(false)
+}
+
+model CauseList {
+  id          String   @id @default(cuid())
+  courtId     String
+  court       Court    @relation(fields: [courtId], references: [id])
+  listDate    DateTime
+  judgeId     String?
+  courtroom   String?
+  items       Json     // or create CauseListItem model for better querying
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@unique([courtId, listDate, judgeId])
+  @@index([listDate])
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  amount        Decimal
+  currency      String   @default("INR")
+  purpose       String
+  status        String   // pending, success, failed
+  gatewayRef    String?
+  receiptUrl    String?
+  createdAt     DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String?
+  entityId  String?
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
+}
+
+model NewsCircular {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  type        String   // news, circular, notification, practice_direction
+  publishedAt DateTime?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
